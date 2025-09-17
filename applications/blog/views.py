@@ -7,7 +7,7 @@ class BlogListView(ListView):
     model = Post
     template_name = "blog/blog.html"
     context_object_name = "posts"
-    paginate_by = 3  # número de posts por página
+    paginate_by = 4 # número de posts por página
     ordering = ["-created"]  # opcional: ordenar por fecha descendente
 
 
@@ -16,7 +16,7 @@ class CategoryPostListView(ListView):
     model = Post
     template_name = "blog/category.html"
     context_object_name = "posts"
-    paginate_by = 3
+    paginate_by = 4
 
     def get_queryset(self):
         category_id = self.kwargs.get("category_id")

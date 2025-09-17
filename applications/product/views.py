@@ -16,7 +16,7 @@ from .forms import ProductForm
 class ProductListView(ListView):
     template_name="product/producto_lista.html"
     context_object_name='productos'
-    paginate_by=8
+    paginate_by=10
 
     def get_queryset(self):
         kword=self.request.GET.get("kword", '')
@@ -54,7 +54,7 @@ class CategoryProductListView(ListView):
     model = Producto
     template_name = "product/category_list.html"
     context_object_name = "products"  # más consistente con los templates
-    paginate_by=10
+    paginate_by=8
 
 
     def get_queryset(self):
