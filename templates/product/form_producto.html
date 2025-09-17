@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% load  static %}
+
+{% block content %}
+
+<div class="row g-3 creando-producto p-3">
+
+  <div class="col-md-12">
+
+
+
+
+
+
+    <div class="row"> 
+      <h3 class="col mt-4" style="margin-bottom: 1em; text-align: center;">Datos del Producto</h3>
+    </div>
+
+    <div class="row">
+
+
+        <form class="col-md-12" method="POST">{% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Nombre del Producto:</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                        {{ form.nombre }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label>Unidad de Medida:</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                        {{ form.unidad }}
+                    </div>
+                </div>
+            </div>  
+                  
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Precio Compra:</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                        {{form.precio_compra}}
+                    </div>
+                    {% for error in form.precio_compra.errors %}
+                        <p class="col" style="color: red;">
+                        {{ error|escape }}
+                        </p>
+                    {% endfor %}
+                </div>
+
+                <div class="col-md-6">
+                    <label>Precio Venta:</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                        {{form.precio_venta}}
+                    </div>
+                    {% for error in form.precio_venta.errors %}
+                        <p class="cell" style="color: red;">
+                        {{ error|escape }}
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+             
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Categoria:</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-list-ol" style="color: #0d6efd;"></i></span>
+                        {{form.categoria}}
+                    </div>
+                </div>
+            
+                <div class="col-md-6">
+                    <label>Descripcion del producto:</label>
+                    <div class="input-group">
+                        {{form.descripcion}}
+                    </div>
+                </div>
+            </div>
+
+             <div class="row">
+                <div class="col-md-6">
+                    <label>Cantidad:</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-list-ol" style="color: #0d6efd;"></i></span>
+                        {{form.cantidad}}
+                    </div>
+                </div>
+            
+                
+            </div>
+             
+            <div class="row d-flex justify-content-center">
+                <button type="submit" class="col-md-12 btn btn-success mt-2 mb-2 w-80 text-uppercase" >Guardar</button>
+                {% if form.instance.pk %}
+                <a href="{% url 'producto_app:producto-delete' form.instance.pk %}" class="col-md-12 w-80 btn btn-danger text-uppercase">Eliminar</a>
+                {% endif %}
+            </div>
+        </form>
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+  </div>
+</div>
+
+{% endblock %}

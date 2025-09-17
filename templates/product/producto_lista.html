@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+    <div class="container-fluid px-4 px-lg-5">
+        <div class="bg-secondary mt-3 mb-3 px-4 row align-items-center">
+          <!-- Formulario de búsqueda -->
+          <form class="col-12 col-md-10 mt-3 mb-3" method="GET">
+            <div class="input-group">
+              <span class="input-group-text">COD</span>
+              <input class="form-control" type="text" id="kword" name="kword" placeholder="nombre o codigo...">
+              <button type="submit" class="btn btn-primary">Buscar</button>
+            </div>
+          </form>
+
+          <!-- Botón registrar nuevo -->
+          <div class="col-12 col-md-2 mt-3 mb-3 text-md-end text-center">
+              <a href="{% url 'producto_app:producto-add' %}" class="btn btn-success w-100 w-md-auto">
+                  Registrar Nuevo
+              </a>
+          </div>
+        </div>
+
+    
+            
+        
+        
+        <h2 class="mb-4 text-center mt-4">Lista de Productos</h2>
+        <table class="table table-striped tabla mt-5">
+            <thead>
+                <tr>
+                
+                <th scope="col">Nombre</th>
+                
+                <th scope="col">P.V</th>
+                
+                <th scope="col">Descripción</th>
+                
+                <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in productos %}
+                    <tr class="{% if product.count <= 6 %}table-danger{% endif %}">
+                        
+                        <td>{{product.nombre}}</td>
+                       
+                        <td>{{product.precio_venta}}</td>
+                        
+                        <td>{{product.descripcion}}</td>
+                        
+                        <td>
+                          {% if product.id %}
+                            <a href="{% url 'producto_app:producto-update' product.id %}" class="btn btn-success"><i class="bi bi-pencil"></i></a>
+                          {% else %}
+                          <a href="{% url 'producto_app:producto-add' %}" class="btn btn-success mb-3">Registrar Nuevo</a>
+                          {% endif %}
+                          {% if product.id %}
+                          <a href="{% url 'producto_app:producto-detail' product.id %}" class="btn btn-danger"><i class="bi bi-eye"></i></a>
+                          {% else %}
+                          <a href="{% url 'producto_app:producto-add' %}" class="btn btn-success mb-3">Registrar Nuevo</a>
+                          {% endif %}
+                          
+                        </td>
+
+                    </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
+
+        {% if is_paginated %}
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
+                <li class="page-item ">
+                  <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1">&laquo;</a>
+                </li>
+              {% endif %}
+              {% for i in paginator.page_range %}
+                <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+              {% endfor %}
+
+              {% if page_obj.has_next %}
+                <li class="page-item ">
+                  <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1">&raquo;</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        {% endif %}
+    </div>
+    
+{% endblock %}

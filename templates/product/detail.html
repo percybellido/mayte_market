@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% load  static %}
+
+{% block content %}
+
+<div class="row bg-primary">
+  <h3 class="col mt-3" style="margin-bottom: 1em; text-align: center;">Detalle del producto</h3>  
+  <div class="row">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                    <h4 style="text-align: center;">{{ producto.nombre }}</h4>
+                    <p><span style="font-weight: bold;">Unidad de medida:</span> {{ producto.get_unidad_display }}</p>
+                    <p><span style="font-weight: bold;">Cantidad en Almacen:</span> {{ producto.cantidad }}</p>
+                    <p><span style="font-weight: bold;">Precio Compra:</span> {{ producto.precio_compra }}</p>
+                    <p><span style="font-weight: bold;">Precio Venta:</span> {{ producto.precio_venta }}</p>
+                    <p><span style="font-weight: bold;">Descripcion:</span> {{ producto.descripcion }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+              
+    </div>
+</div>
+
+{% endblock %}

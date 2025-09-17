@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <title>Mayte_Market</title>
+</head>
+<body>
+    <header class="hero" style="background-image: url('{% static "img/fondo1.jpg" %}');">
+        <nav class="navbar encabezado navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid menu">
+                <a class="navbar-brand mb-0" href="#">Mayte Market</a>
+           
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <!-- Siempre visibles -->
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+                               href="{% url 'inicio_app:home' %}">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'producto-list' %}active{% endif %}" 
+                               href="{% url 'producto_app:producto-list' %}">Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'blog' %}active{% endif %}" 
+                               href="{% url 'blog_app:blog' %}">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'contacto' %}active{% endif %}" 
+                               href="{% url 'contact_app:contact' %}">Contacto</a>
+                        </li>
+
+                        {% if user.is_authenticated %}
+                            <!-- Menú Ventas -->
+                            <li class="nav-item dropdown px-lg-4">
+                                <a class="nav-link dropdown-toggle" href="#" id="ventasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Ventas
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="ventasDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'cliente_app:lista-clientes' %}">Listar Clientes</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'producto_app:producto-lista' %}">Lista de Productos</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'venta_app:venta-index' %}">Vender</a></li>
+                                    <li>
+                                        {% if cliente_en_sesion %}
+                                            <a class="dropdown-item" href="{% url 'cliente_app:historial_cliente' cliente_en_sesion.id %}">
+                                                Ver historial {{ cliente_en_sesion.Cli_Nombre }}
+                                            </a>
+                                        {% else %}
+                                            <span class="dropdown-item text-muted">Sin cliente</span>
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <!-- Menú Gestión -->
+                            <li class="nav-item dropdown px-lg-4">
+                                <a class="nav-link dropdown-toggle" href="#" id="gestionDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Gestión
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="gestionDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'users_app:user-lista' %}">Usuarios</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administrador</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Salir -->
+                            <li class="nav-item px-lg-4">
+                                <a class="nav-link text-uppercase" href="{% url 'users_app:user-logout' %}">Salir</a>
+                            </li>
+                        {% else %}
+                            <!-- Ingresar -->
+                            <li class="nav-item px-lg-4">
+                                <a class="nav-link text-uppercase {% if request.resolver_match.url_name == 'user-login' %}active{% endif %}" 
+                                   href="{% url 'users_app:user-login' %}">Ingresar</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <h1 class="titulo mb-0">Mayte Market</h1>
+    </header>
+
+    {% block content %}{% endblock %}
+    
+    <footer class="pie footer fw-normal"
+        style="background-image: url('{% static "img/footer7.jpg" %}');
+               background-repeat: no-repeat;
+               background-position: center;
+               background-size: cover;
+               padding: 1.5rem 0;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 1rem;">
+        <p class="m-0">Copyright &copy; Mayte Market 2025</p>
+    </footer>
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

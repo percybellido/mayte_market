@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% load  static %}
+
+{% block content %}
+
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h5 class="text-center mb-4">¿Desea eliminar el producto?</h5>
+      <form action="{% url 'producto_app:producto-delete' producto.id %}" method="POST">
+        {% csrf_token %}
+        <div class="card">
+          <div class="card-header">
+            Quedan: {{ producto.cantidad }}
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">{{ producto.nombre }}</h5>
+            <p class="card-text">Descripción: {{ producto.descripcion }}</p>
+            <div class="d-flex justify-content-between">
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+              <a href="{% url 'producto_app:producto-lista' %}" class="btn btn-secondary">Volver</a>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

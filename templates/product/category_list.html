@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h2 class="text-center my-4 producto fw-bold">🛒 Nuestros Productos</h2>
+
+<!-- Menú de categorías -->
+<ul class="nav nav-pills justify-content-center mb-4 custom-categories">
+    <li class="nav-item">
+        <a class="nav-link {% if not current_slug %}active{% endif %}" href="{% url 'producto_app:producto-list' %}">Todas</a>
+    </li>
+    {% for cat in categories %}
+        <li class="nav-item">
+            {% if cat.slug %}
+                <a class="nav-link text-uppercase{% if current_slug == cat.slug %} active{% endif %}" 
+                href="{% url 'producto_app:producto-category' cat.slug %}">
+                    {{ cat.nombre }}
+                </a>
+            {% else %}
+                <span class="nav-link disabled text-uppercase">{{ cat.nombre }}</span>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
+<!-- Lista de productos -->
+<div class="row g-4 px-4">
+    {% for producto in products %}
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 rounded-3 hover-card h-100">
+                <div class="position-relative">
+                    {% if producto.image %}
+                        <img src="{{ producto.image.url }}" class="card-img-top p-2 rounded-3" alt="{{ producto.nombre }}">
+                    {% else %}
+                        <img src="{% static 'img/no-image.jpg' %}" class="card-img-top p-2 rounded-3" alt="Sin imagen">
+                    {% endif %}
+
+                    <!-- Etiquetas dinámicas -->
+                    {% if producto.en_oferta %}
+                        <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Oferta</span>
+                    {% endif %}
+                    {% if producto.es_nuevo %}
+                        <span class="badge bg-success position-absolute top-0 end-0 m-2">Nuevo</span>
+                    {% endif %}
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title text-dark fw-bold">{{ producto.nombre }}</h5>
+                    
+                    <!-- Precio -->
+                    <p class="fw-bold fs-5 text-primary mb-1">
+                        S/. {{ producto.precio_venta }}
+                    </p>
+                    <p class="text-muted text-decoration-line-through small">
+                        S/. {{ producto.precio_venta|add:"2" }}
+                    </p>
+
+                    {% if not producto.disponible %}
+                        <span class="badge bg-danger">¡Agotado!</span>
+                    {% endif %}
+                    <!-- Estrellas -->
+                    <div class="mb-2 text-warning">
+                        ★★★★☆
+                    </div>
+
+                    <!--<a href="#" class="btn btn-sm btn-outline-primary w-100 fw-bold">Añadir al carrito</a>-->
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-center">No hay productos para esta categoría.</p>
+    {% endfor %}
+</div>
+
+<!-- Menú de paginación -->
+{% if is_paginated %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item ">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">&laquo;</a>
+        </li>
+      {% endif %}
+      {% for i in paginator.page_range %}
+        <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+          <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item ">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">&raquo;</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+
+{% endblock %}

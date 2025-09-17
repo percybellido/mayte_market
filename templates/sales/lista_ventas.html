@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load tz %}
+{% block content %}
+
+
+   
+ <h1 class="text-center py-3 color-fuente">Lista de Ventas</h1>
+    <table class="table table-secondary fuente table-hover mb-0">
+        <thead>
+            <tr>
+            <th scope="col">Cliente</th>
+            <th scope="col">Venta</th>
+            <th scope="col">Fecha</th>
+            
+            </tr>
+        </thead>
+        <tbody>
+            {% for l in lista_ventas %}
+                <tr>
+                <th scope="row">{{l.Venta_CliId}} </th>
+                <td>{{l.Venta_Total}}</td>
+                <td>{{l.Venta_Fecha |localtime|date:"d/m/Y H:i"}} </td>
+                </tr>
+            {% endfor %}
+        
+        </tbody>
+    </table>
+    <!-- Menú de paginación -->
+{% if is_paginated %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item ">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">&laquo;</a>
+        </li>
+      {% endif %}
+      {% for i in paginator.page_range %}
+        <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+          <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item ">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">&raquo;</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<div class="container fondo">
+  <div class="row mb-3 mt-3">
+    <form class="col-md-8 " method="POST">{% csrf_token %}
+      <div class="mb-3">
+      
+        {% if cliente %}
+          <p><strong>Cliente:</strong> {{ cliente }}</p>
+          <input type="hidden" name="cliente" value="{{ cliente.id }}">
+        {% else %}
+            {{ form.cliente }}
+        {% endif %}
+      </div>
+      <label class="input-group-text d-flex align-items-center mb-2">COD/CAN:</label>
+        {{ form.producto }}
+        {{ form.cantidad }}
+      <button type="submit" class="btn btn-secondary ms-2 mt-2 mb-2">Agregar</button>
+    </form>
+
+    
+
+    <div class="col-md-4">
+      <a class="btn btn-outline-secondary w-100" href="{% url 'venta_app:lista-ventas' %}">
+        <i class="bi bi-trash"></i>
+        <span>Ultimas Ventas</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <h5>Productos en Venta</h5>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            
+            <th scope="col">Nombres</th>
+            <th scope="col">Precio (S/)</th>
+            <th scope="col">Cantidad</th>
+            <th colspan="2" class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in productos %}
+            <tr>
+              
+              <td>{{ product.producto }}</td>
+              <td>{{ product.producto.precio_venta }}</td>
+              <td>{{ product.cantidad|floatformat:2 }}</td>
+              <td>
+                <form action="{% url 'venta_app:carshop-add' product.id %}" method="POST">{% csrf_token %}
+                  <button type="submit" class="btn btn-info"><i class="bi bi-plus"></i></button>
+                </form>
+              </td>
+              <td>
+                <form action="{% url 'venta_app:carshop-update' product.id %}" method="POST">{% csrf_token %}
+                  <button type="submit" class="btn btn-primary"><i class="bi bi-dash"></i></button>
+                </form>
+              </td>
+              <td>
+                <form action="{% url 'venta_app:carshop-delete' product.id %}" method="POST">{% csrf_token %}
+                  <button type="submit" class="btn btn-danger"><i class="bi bi-x"></i></button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-md-4 mb-2">
+
+      <div class="alert alert-success text-center">
+        <h5>Cliente: {{ cliente }}</h5>
+        
+      </div>
+      <div class="alert alert-success text-center">
+        <h5>Total a Cobrar: S/ {{ total_cobrar }}</h5>
+        
+      </div>
+
+      <a href="{% url 'venta_app:registrar_abono' %}" class="btn btn-secondary w-100 my-2">Registrar Abono</a>
+
+      <!--<form action="{% url 'venta_app:venta-simple' %}" method="POST">{% csrf_token %}
+        <button type="submit" class="btn btn-primary w-100 mb-2">
+          <i class="bi bi-credit-card"></i> Pagar Todo
+        </button>
+      </form>-->
+
+    <form action="{% url 'venta_app:confirmar_venta' %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-success w-100 mb-2">Confirmar Venta</button>
+    </form>
+
+   
+      <form action="{% url 'venta_app:carshop-delete_all' %}" method="POST">{% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger w-100">
+          <i class="bi bi-trash"></i> Limpiar Todo
+        </button>
+      </form>
+    </div>
+  </div>
+
+  
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+  
+
+  $(document).ready(function() {
+      $('.select-cliente').select2({
+          placeholder: "Buscar cliente...",
+          allowClear: true
+      });
+
+      $('.select-producto').select2({
+          placeholder: "Buscar producto...",
+          allowClear: true
+      });
+  });
+</script>
+
+{% endblock %}

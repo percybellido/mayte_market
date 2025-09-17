@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load tz %}
+{% block content %}
+<div class="container my-5">
+    <h2 class="row text-center d-block text-uppercase mb-3">Mi Blog</h2>
+    <div class="row justify-content-center">
+        
+        <div class="col-lg-10">
+            {% for post in posts %}
+            <div class="card mb-5 shadow-lg border-0 hover-card">
+                <!-- Imagen del post -->
+                {% if post.image %}
+                <img src="{{ post.image.url }}" class="card-img-top rounded-top" alt="{{ post.title }}">
+                {% endif %}
+
+                <div class="card-body p-4">
+                    <!-- Fecha -->
+                    <small class="text-muted d-block mb-2">
+                        📅 {{ post.created|localtime|date:"d/m/Y H:i" }}
+                    </small>
+
+                    <!-- Título -->
+                    <h2 class="card-title mb-3 color-fuente">{{ post.title }}</h2>
+
+                    <!-- Contenido -->
+                    <p class="card-text mb-3">
+                        {{ post.content|safe }}
+                    </p>
+
+                    <!-- Autor y categorías -->
+                    <p class="mb-0">
+                        ✍️ Publicado por <b class="text-warning">{{ post.author }}</b> en 
+                        <em>
+                            {% for category in post.categories.all %}
+                                <a href="{% url 'blog_app:category' category.id %}" class="link text-decoration-none fst-italic">
+                                    {{ category.name }}
+                                </a>{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </em>
+                    </p>
+                </div>
+            </div>
+            {% empty %}
+                <p class="text-center text-muted">No hay publicaciones aún.</p>
+            {% endfor %}
+        </div>
+        <!-- Menú de paginación -->
+{% if is_paginated %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item ">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">&laquo;</a>
+        </li>
+      {% endif %}
+      {% for i in paginator.page_range %}
+        <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+          <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item ">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">&raquo;</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+    </div>
+</div>
+{% endblock %}

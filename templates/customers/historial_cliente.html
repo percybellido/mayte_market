@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 class="ventas-cliente text-center mt-4 mb-4">Últimas compras de {{ cliente.nombre }}</h2>
+
+{% if ultimas_ventas %}
+  {% for venta in ultimas_ventas %}
+    <p class="m-2">
+      <strong>Fecha:</strong> {{ venta.Venta_Fecha }} |
+      <strong>Total:</strong> S/ {{ venta.Venta_Total|floatformat:2 }} |
+      <strong>Cantidad total:</strong> {{ venta.Venta_cantidad }}
+    </p>
+
+    <table class="table fuente table-dark table-hover mb-0 px-1">
+      <thead class="table-light">
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Precio Unitario (S/)</th>
+          <th>SubTotal (S/)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for detalle in venta.detalles.all %}
+        <tr>
+          <td>{{ detalle.producto.nombre }}</td>
+          <td>{{ detalle.VD_Cantidad }}</td>
+          <td>{{ detalle.VD_Precio|floatformat:2 }}</td>
+          <td>{{detalle.subtotal|floatformat:2}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endfor %}
+{% else %}
+  <p>No tiene compras registradas.</p>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contacto{% endblock %}
+
+{% block content %}
+{% if messages %}
+  <div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+      {% for message in messages %}
+        <div class="toast align-items-center text-white 
+                    {% if message.tags == 'success' %}bg-success
+                    {% elif message.tags == 'error' %}bg-danger
+                    {% else %}bg-info{% endif %} 
+                    border-0 mb-2"
+             role="alert" aria-live="assertive" aria-atomic="true"
+             data-bs-autohide="true" data-bs-delay="4000">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <h2 class="text-center mb-4 text-uppercase">Contacto</h2>
+            <p class="text-center text-muted mb-5">
+                ¿Tienes alguna consulta o comentario? Completa el formulario y te responderemos lo antes posible.
+            </p>
+
+            <!-- Información de contacto -->
+            <div class="text-center mb-4">
+                <p><i class="fas fa-phone-alt me-2 text-primary"></i><b>Teléfono:</b> +51 935 905 332</p>
+                <p><i class="fas fa-envelope me-2 text-primary"></i><b>Email:</b> pcbellido@hotmail.com</p>
+            </div>
+
+            <!-- Formulario -->
+            <form method="post" class="p-4 shadow rounded formulario">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+
+                <div class="mb-3">
+                    {{ form.name.label_tag }}
+                    {{ form.name }}
+                    {{ form.name.errors }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                    {{ form.email.errors }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.content.label_tag }}
+                    {{ form.content }}
+                    {{ form.content.errors }}
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn boton btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i>Enviar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    toastElList.map(function (toastEl) {
+      const option = { delay: 4000 } // 4 segundos
+      const bsToast = new bootstrap.Toast(toastEl, option)
+      bsToast.show()
+    })
+  })
+</script>
+
+{% endblock %}

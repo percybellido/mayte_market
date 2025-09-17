@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-center">Utilidad de ventas del cliente: {{ cliente.nombre }}</h2>
+
+<p><strong>Utilidad acumulada:</strong> {{ utilidad_acumulada|floatformat:2 }}</p>
+
+<table class="table fuente table-dark table-hover mb-0 px-1">
+    <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Monto de la Venta</th>
+      <th>Utilidad de la Venta</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for venta in ventas %}
+      <tr>
+        <td>{{ venta.Venta_Fecha|date:"d/m/y" }}</td>
+        <td>{{ venta.monto_total|floatformat:2 }}</td>
+        <td>{{ venta.utilidad_total|floatformat:2 }}</td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="3">No hay ventas registradas</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

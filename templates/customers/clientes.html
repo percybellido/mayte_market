@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<section class="clientes-hero">
+  <div class="overlay">
+    <div class="texto-fondo">
+      <h1>Clientes</h1>
+      <p>Gestión de clientes de Mayte Market</p>
+      <a href="{% url 'cliente_app:clientes' %}" class="btn btn-primary mt-3">Agregar Cliente</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
