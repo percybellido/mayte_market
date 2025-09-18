@@ -151,7 +151,7 @@ class ListVentas(ListView):
     context_object_name='lista_ventas'
     template_name='sales/lista_ventas.html'
     paginate_by=8
-    ordering=['-Venta_Fecha']
+    ordering=['Venta_Fecha']
 
     def get_queryset(self):
         return Venta.objects.listar_ventas()

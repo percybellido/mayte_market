@@ -22,25 +22,16 @@ class HistorialVentasCliente(DetailView):
     model = Cliente
     template_name = 'customers/historial_cliente.html'
     context_object_name = 'cliente'
-    paginate_by=10
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # obtenemos todas las ventas del cliente
-        ventas = self.object.cliente_venta.all().order_by('-Venta_Fecha')
-
-        # paginación
-        paginator = Paginator(ventas, self.paginate_by)
-        page_number = self.request.GET.get("page")
-        page_obj = paginator.get_page(page_number)
-
-        # contexto
-        context['ultimas_ventas'] = page_obj   # ahora es un Page object
-        context['page_obj'] = page_obj
-        context['paginator'] = paginator
-        context['is_paginated'] = page_obj.has_other_pages()
-
+        # mostrar solo las 20 ventas más recientes
+        context['ultimas_ventas'] = (
+            self.object.cliente_venta.all()
+            .order_by('-Venta_Fecha')[:20]
+        )
         return context
+
     
 
 class HistorialClienteView(ListView):
