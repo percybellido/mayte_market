@@ -1,0 +1,31 @@
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de entorno virtual
+.venv/
+venv/
+env/
+
+# Archivos de configuración de Django
+*.log
+*.pot
+*.pyc
+*.pyo
+*.mo
+*.sqlite3
+db.sqlite3
+
+# Configuración local (no debe subirse al repo)
+mayte_market/settings/local.py
+
+# Archivos de IDE/editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
