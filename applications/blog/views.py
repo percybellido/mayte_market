@@ -21,7 +21,7 @@ class CategoryPostListView(ListView):
     def get_queryset(self):
         category_id = self.kwargs.get("category_id")
         self.category = get_object_or_404(Category, id=category_id)
-        return Post.objects.filter(category=self.category).order_by("-created")
+        return Post.objects.filter(categories=self.category).order_by("-created")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

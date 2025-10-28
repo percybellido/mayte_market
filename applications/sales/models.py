@@ -9,7 +9,7 @@ from .managers import VentaManagers, CarShopManager
 class Venta(models.Model):
     Venta_Fecha=models.DateTimeField('Fecha de Venta')
     Venta_CliId=models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='cliente_venta', null=False)
-    Venta_cantidad=models.PositiveIntegerField('Cantidad de Producto')
+    Venta_cantidad=models.DecimalField('Cantidad de Producto', max_digits=10, decimal_places=2, default=0)
     Venta_NroFact = models.CharField('Número de Boleta', max_length=20, null=True, blank=True)
     Venta_Total=models.DecimalField('Total', max_digits=10, decimal_places=2)
     created = models.DateTimeField(auto_now_add=True)
@@ -31,6 +31,10 @@ class Venta(models.Model):
             )
         )
         return utilidad['total'] or 0
+
+    @property
+    def total(self):
+        return sum(d.subtotal for d in self.detalles.all())
 
     objects=VentaManagers()
 
@@ -145,6 +149,7 @@ class CarShop(models.Model):
     decimal_places=2,
     default=0
     )
+    precio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     objects=CarShopManager()

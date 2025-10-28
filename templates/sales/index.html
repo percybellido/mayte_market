@@ -20,6 +20,7 @@
       <label class="input-group-text d-flex align-items-center mb-2">COD/CAN:</label>
         {{ form.producto }}
         {{ form.cantidad }}
+        {{ form.precio_unitario }}
       <button type="submit" class="btn btn-secondary ms-2 mt-2 mb-2">Agregar</button>
     </form>
 
@@ -51,7 +52,7 @@
             <tr>
               
               <td>{{ product.producto }}</td>
-              <td>{{ product.producto.precio_venta }}</td>
+              <td>{{ product.precio|floatformat:2 }}</td>
               <td>{{ product.cantidad|floatformat:2 }}</td>
               <td>
                 <form action="{% url 'venta_app:carshop-add' product.id %}" method="POST">{% csrf_token %}

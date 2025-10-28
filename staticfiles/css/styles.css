@@ -1,0 +1,366 @@
+body {
+    background: #f2f2f2;
+    font-family: 'Lato', sans-serif;
+}
+
+.encabezado {
+    display: flex;
+    justify-content: space-between;
+}
+.logo{
+    color:rgb(8, 114, 22);
+    font-family:'Dancing Script', sans-serif;
+    padding:20px;
+}
+.navegacion{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    gap: 2rem;
+    padding: 0 2rem;
+  
+}
+.navbar-brand {
+    color:rgb(8, 114, 22);
+    font-family:'Dancing Script', sans-serif;
+}
+a .navbar-brand{
+    margin-bottom: 0;
+}
+.menu {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+}
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgb(8, 114, 22)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+.navbar-toggler {
+  border-color: rgb(8, 114, 22); /* Cambia el color del borde */
+}
+
+.navbar-toggler:focus {
+  outline: none; /* quita el borde azul predeterminado */
+  box-shadow: 0 0 0 0.25rem rgba(8, 114, 22, 0.5); /* sombra verde suave */
+  border-color: rgb(8, 114, 22); /* asegura que el borde también sea verde */
+}
+
+@media (max-width: 767.98px) {
+  .navbar-toggler {
+    display: block;
+    margin: 0 auto;
+  }
+  .navbar-brand {
+    font-size: 40px;
+    text-align: center;
+    padding-left: 30px;
+  }
+}
+.navbar a{
+    color: rgb(8, 114, 22);
+    text-decoration: none;
+}
+
+.titulo {
+    font-family:'Dancing Script', sans-serif;
+    text-align: center;
+    padding-top: 10px;
+    color: rgb(8, 114, 22);
+    font-size: 60px;
+}
+
+@media (max-width: 460px){
+    .titulo {
+        display: none;
+    }
+}
+
+
+.hero {
+    background-size: cover;       /* para ver la imagen completa */
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100%;
+    height: 400px;
+    
+}
+
+@media (max-width: 460px){
+    .hero {
+        width: 100%;
+        height: 300px;
+
+    }
+
+    .menu {
+        justify-content: center;
+    }
+}
+.subtitulo{
+    background-color: rgba(224, 223, 221, 0.932);
+}
+
+.creando-producto{
+    background-color: #f2f2f2;
+}
+
+.clientes-hero {
+    background-image: url('../img/clientes_fondo2.jpg'); /* ajusta ruta si es necesario */
+    background-size: cover;
+    background-position: center;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Sombra oscura encima de la imagen */
+.clientes-hero .overlay {
+    background-color: rgba(0, 0, 0, 0.5); /* oscurece */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Texto centrado */
+.texto-fondo {
+    color: white;
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.pie{
+    background-color:rgb(51, 50, 50);
+    color: rgb(8, 114, 22);
+}
+
+.pie p {
+    text-align: center;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.color-fuente{
+    color: rgb(8, 114, 22);
+}
+.footer {
+    height: 10rem;
+    
+}
+.display-5{
+    color:rgb(8, 114, 22);
+}
+
+@media (max-width: 991.98px) {
+  .navbar-nav .nav-link {
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  .navbar-nav .nav-item {
+    margin: 0; /* quita separación extra entre items */
+  }
+}
+
+@media (max-width: 991.98px) {
+  .navbar-brand {
+    margin-bottom: 0.2rem; /* reduce espacio bajo el título */
+  }
+  .navbar-collapse .navbar-nav {
+    margin-top: 0.2rem;   /* reduce espacio antes del primer link */
+  }
+}
+
+/* styles.css */
+
+.dropdown-menu {
+  background-color: #1e3a8a; /* azul oscuro, mismo que tu header */
+  border: none;             /* quitar borde feo */
+}
+
+.dropdown-menu .dropdown-item {
+  color: #fff;              /* texto blanco */
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+  background-color: #3b82f6; /* azul más claro al pasar */
+  color: #fff;
+}
+@media (max-width: 768px) {
+  .dropdown-menu {
+    min-width: 6rem;
+    width: fit-content;
+  }
+}
+@media (max-width: 768px) {
+  .dropdown-menu {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    min-width: max-content; /* se ajusta al contenido */
+  }
+}
+
+/* Tablets (pantallas <= 991px) */
+@media (max-width: 991px) {
+  table.table {
+    font-size: 0.9rem;  /* Reduce fuente */
+  }
+  .table th,
+  .table td {
+    padding: 0.5rem;  /* Menos espacio */
+  }
+  .btn-sm {
+    font-size: 0.75rem; /* Botones más pequeños */
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Móviles (pantallas <= 576px) */
+@media (max-width: 576px) {
+  table.table {
+    font-size: 0.75rem;  /* Fuente aún más pequeña */
+  }
+  .table th,
+  .table td {
+    padding: 0.25rem;  /* Muy compacto */
+  }
+  .btn-sm {
+    font-size: 0.7rem; 
+    padding: 0.2rem 0.4rem;
+  }
+  h1.text-center {
+    font-size: 1.25rem; /* Título más pequeño */
+  }
+}
+
+/* Desktop y tablets: los botones se alinean en fila normal */
+.botones-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* En móviles: 2 botones arriba (50% cada uno) y 1 abajo */
+@media (max-width: 576px) {
+  .botones-acciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* dos columnas iguales */
+    gap: 0.5rem;
+  }
+
+  .botones-acciones a {
+    width: 100%; /* cada botón ocupa su columna */
+  }
+
+  .botones-acciones .utilidad-btn {
+    grid-column: span 2; /* ocupa las dos columnas abajo */
+  }
+}
+
+.table td, 
+.table th {
+  vertical-align: middle !important;
+}
+
+.ventas-cliente{
+    color: rgb(8, 114, 22);
+}
+    
+.hover-card {
+  transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+}
+.hover-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+.card-title {
+  font-size: 1.05rem;
+}
+
+.formulario {
+  background-color: rgba(219, 152, 27, 0.9); /* naranja suave */
+  padding: 2rem;             /* espacio interno */
+  border-radius: 10px;       /* bordes redondeados */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* sombra elegante */
+  max-width: 700px;          /* ancho máximo centrado */
+  margin: 2rem auto;         /* centra horizontalmente */
+  color: white;              /* texto blanco */
+}
+
+/* Inputs */
+.formulario input,
+.formulario textarea {
+  background-color: #fff7e6;   /* un beige que combina */
+  border: 1px solid rgb(85, 59, 11);
+  color: #333;
+}
+
+/* Botón */
+.formulario .boton {
+  background-color: rgb(85, 59, 11);  /* marrón */
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.formulario .boton:hover {
+  background-color: rgb(63, 43, 8); /* marrón más oscuro al pasar */
+}
+
+.filaamarillo {
+  background-color: hsl(45, 100%, 51%) !important; /* amarillo Bootstrap */
+  color: #000 !important;
+}
+
+.filanaranja {
+  background-color: #fd7e14 !important; /* naranja Bootstrap */
+  color: #fff !important;
+}
+
+.filarojo {
+  background-color: #d31023 !important; /* rojo Bootstrap */
+  color: #fff !important;
+}
+
+
+.custom-categories .nav-link {
+    color: #555;                 /* gris neutro para la fuente */
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+    padding: 6px 14px;
+    transition: all 0.3s ease;
+}
+
+.custom-categories .nav-link:hover {
+    background-color: #e8f5e9;    /* verde claro al pasar el mouse */
+    color: #2e7d32;               /* verde hoja en el texto */
+}
+
+.custom-categories .nav-link.active {
+    background-color: #2e7d32;    /* verde hoja sólido */
+    color: #fff !important;       /* texto blanco */
+    font-weight: 600;
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 576px) {
+    .custom-categories .nav-link {
+        font-size: 0.8rem;       /* fuente más pequeña en móviles */
+        padding: 4px 10px;       /* menos padding para compactar */
+    }
+}
+

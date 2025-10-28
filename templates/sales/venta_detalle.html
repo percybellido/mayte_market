@@ -27,7 +27,7 @@
         <td>{{ detalle.producto.nombre }}</td>
         <td>{{ detalle.VD_Cantidad }}</td>
         <td>S/ {{ detalle.VD_Precio }}</td>
-        <td>S/ {{ detalle.subtotal }}</td>
+        <td>S/ {{ detalle.subtotal|floatformat:2 }}</td>
       </tr>
       {% empty %}
       <tr>
@@ -39,7 +39,7 @@
 
   <!-- Total -->
   <div class="text-end mt-3">
-    <h4 class="fw-bold">Total: S/ {{ venta.Venta_Total }}</h4>
+    <h4 class="fw-bold">Total: S/ {{ venta.total|floatformat:2 }}</h4>
   </div>
 
   <!-- Mensaje de agradecimiento -->

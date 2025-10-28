@@ -25,10 +25,18 @@ DATABASES = {
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+ 
 STATICFILES_DIRS=[BASE_DIR/'static']
 
 MEDIA_URL='/media/'
 MEDIA_ROOT=BASE_DIR/'media'
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://rominasmarket.com",
+    "https://www.rominasmarket.com",  # si en algún momento lo usas
+]
+
 
 EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST="smtp.gmail.com"

@@ -34,7 +34,7 @@ class CarShopManager(models.Manager):
     def total_cobrar(self):
         consulta=self.aggregate(
             total=Sum(
-                F('cantidad')*F('producto__precio_venta'),
+                F('cantidad')*F('precio'),
                 output_field=FloatField()
             ),
         )
@@ -46,7 +46,7 @@ class CarShopManager(models.Manager):
     def ganancia(self):
         utilidad = self.aggregate(
             total=Sum(
-                (F('producto__precio_venta') - F('producto__precio_compra')) * F('cantidad'),
+                (F('precio') - F('producto__precio_compra')) * F('cantidad'),
                 output_field=FloatField()
             )
         )

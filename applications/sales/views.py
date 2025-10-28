@@ -55,6 +55,7 @@ class AddCarView(VentasPermisoMixin, FormView):
             cliente = Cliente.objects.get(id=cliente_id)
         producto = form.cleaned_data['producto']
         cantidad = form.cleaned_data['cantidad']
+        precio_unitario = form.cleaned_data.get('precio_unitario') or producto.precio_venta
 
         # Guardar cliente en sesión si no existe
         if 'cliente_id' not in self.request.session:
@@ -69,12 +70,18 @@ class AddCarView(VentasPermisoMixin, FormView):
             cliente=cliente,
             defaults={
                 'cantidad': cantidad,
+                'precio' : precio_unitario,
             }
         )
         #
         if not created:
             obj.cantidad = obj.cantidad + cantidad
+            obj.precio = precio_unitario
             obj.save()
+
+        obj.precio = precio_unitario
+        obj.save()
+
         return super(AddCarView, self).form_valid(form)
     
 class CarShopAddView(VentasPermisoMixin, View):
@@ -222,7 +229,7 @@ class ConfirmarVentaView(LoginRequiredMixin, View):
 
         with transaction.atomic():
             # Calcular totales
-            total_venta = sum(item.producto.precio_venta * item.cantidad for item in carrito)
+            total_venta = sum(item.precio * item.cantidad for item in carrito)
             cantidad_total = sum(item.cantidad for item in carrito)
 
             # Crear la venta
@@ -240,7 +247,7 @@ class ConfirmarVentaView(LoginRequiredMixin, View):
                 VD_VentasId=venta,
                 producto=item.producto,
                 VD_Cantidad=item.cantidad,
-                VD_Precio=item.producto.precio_venta
+                VD_Precio=item.precio
             )
 
         # Limpiar el carrito

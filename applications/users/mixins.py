@@ -46,9 +46,7 @@ class VentasPermisoMixin(LoginRequiredMixin):
         if not check_ocupation_user(request.user.ocupation, User.VENTAS):
             # no tiene autorizacion
             return HttpResponseRedirect(
-                f"{reverse(
-                    'users_app:user-login'
-                )}?{urlencode({'next': request.path})}"
+                f"{reverse('users_app:user-login')}?{urlencode({'next': request.path})}"
             )
         return super().dispatch(request, *args, **kwargs)
 

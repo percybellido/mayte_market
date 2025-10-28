@@ -34,9 +34,33 @@ class VentaForm(forms.Form):
 
     def clean_cantidad(self):
         cantidad = self.cleaned_data['cantidad']
-        if cantidad < 1:
+        if cantidad <= 0:
             raise forms.ValidationError('Ingrese una cantidad mayor a cero')
         return cantidad
+    
+    precio_unitario=forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'step': 'any',
+            'placeholder': 'Precio unitario'
+        })
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "producto" in self.data:
+            try:
+                producto_id= int(self.data.get("producto"))
+                producto = Producto.objects.get(id=producto_id)
+                self.fields["precio_unitario"].initial = producto.precio_venta
+            except (ValueError, Producto.DoesNotExist):
+                pass
+
+
+
 
     
 class PagoForm(forms.Form):
