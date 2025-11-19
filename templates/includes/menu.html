@@ -11,6 +11,9 @@
           <a class="nav-link" href="{% url 'cliente_app:lista-clientes' %}"><i>Listar Clientes</i></a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="{% url 'venta_app:ganancias' %}"><i>Listar Utilidad-Saldos</i></a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="{% url 'producto_app:producto-lista' %}"><i>Lista de Productos</i></a>
         </li>
         <li class="nav-item">
@@ -21,9 +24,7 @@
             <a class="nav-link" href="{% url 'cliente_app:historial_cliente' cliente_en_sesion.id %}">
               <i>Ver historial</i> {{ cliente_en_sesion.Cli_Nombre }}
             </a>
-          {% else %}
-            <span class="nav-link text-light">Sin cliente</span>
-          {% endif %}
+          
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'user-lista' %}active{% endif %}" 

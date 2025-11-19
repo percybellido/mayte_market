@@ -39,6 +39,14 @@
   </tbody>
   
 </table>
+
+<!-- Botón de regreso -->
+      <div class="d-flex justify-content-center justify-content-md-end mt-4">
+        <a href="{% url 'cliente_app:lista-clientes' %}" class="btn-volver">
+            ⬅ Volver al Dashboard
+        </a>
+    </div>
+
 <!-- Menú de paginación -->
     {% if is_paginated %}
       <nav aria-label="Page navigation">

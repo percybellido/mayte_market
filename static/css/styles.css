@@ -364,3 +364,88 @@ a .navbar-brand{
     }
 }
 
+/* Fondo verde y texto blanco para el menú móvil */
+@media (max-width: 991px) {
+    
+     /* Contenedor del menú */
+    .navbar-collapse {
+        position: absolute;
+        top: 70px; /* Debajo del botón hamburguesa */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 85%;           /* Tamaño ideal, no toda la pantalla */
+        max-height: 90vh;     /* Nunca se corta */
+        overflow-y: auto;     /* Solo aparece scroll si es necesario */
+        background: rgba(0, 128, 0, 0.95);
+        backdrop-filter: blur(5px);
+        border-radius: 15px;
+        padding: 1.5rem;
+        z-index: 9999;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.30);
+    }
+
+    /* Botón hamburguesa */
+    .navbar-toggler {
+        z-index: 10000; /* Encima del menú */
+        border: none;
+        background: rgba(0,0,0,0.15);
+        border-radius: 8px;
+        padding: 6px 10px;
+    }
+
+    /* Enlaces del menú */
+    .navbar-nav .nav-link {
+        color: #ffffff !important;
+        font-weight: 600;
+        padding: 10px 0;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+    /* Dropdown dentro del menú */
+    .dropdown-menu {
+        position: static;
+        float: none;
+        background: rgba(0,128,0,0.90);
+        text-align: center;
+        border-radius: 10px;
+        margin-top: .5rem;
+    }
+
+    .dropdown-item {
+        color: white !important;
+        font-weight: 600;
+    }
+   
+}
+
+.hamburger-btn {
+    border: 1.5px solid rgba(0,128,0,0.90) !important; /* verde original */
+}
+.btn-volver {
+    display: inline-block;
+    background-color: #198754;
+    color: #ffffff !important;
+    padding: 0.55rem 1.1rem;
+    border-radius: 0.45rem;
+    border: 1px solid #157347;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-volver:hover {
+    background-color: #157347;
+    border-color: #146c43;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .btn-volver {
+        width: 100%;
+        text-align: center;
+        margin:1 1 1 1;
+    }
+}

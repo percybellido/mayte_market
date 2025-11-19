@@ -14,7 +14,7 @@ from django.utils.timezone import now
 
 from .models import Venta, VentaDetalle, CarShop, PagoVenta, Pago
 from .forms import VentaForm, PagoForm, AbonoForm
-from .functions import procesar_venta
+from .functions import procesar_venta, ganancia_total_por_dia, ganancias_ultimos_dias
 
 from .functions import registrar_pago
 
@@ -272,8 +272,21 @@ class VentaDetailView(DetailView):
         context["detalles"] = venta.detalles.all()  # relacionados por related_name en VentaDetalle
         return context
 
+class GananciasUltimosDiasView(TemplateView):
+    template_name = "sales/ganancias_ultimos_dias.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['ganancias'] = ganancias_ultimos_dias(7)
+        return context
 
+class SaldoTotalView(TemplateView):
+    template_name = "sales/saldo_total.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["saldo_global"] = Cliente.objects.aggregate(total=Sum("saldo"))["total"] or 0
+        return ctx
 
 
 

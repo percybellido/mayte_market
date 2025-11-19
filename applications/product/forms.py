@@ -9,6 +9,7 @@ class ProductForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'}),
         empty_label='Seleccione una categoría'
     )
+
     class Meta:
         model = Producto
         fields = (
@@ -19,66 +20,56 @@ class ProductForm(forms.ModelForm):
             'cantidad',
             'precio_compra',
             'precio_venta',
+            'image',
+            'visible_en_tienda',
+            'disponible',
+            'es_nuevo',
+            'en_oferta',
         )
         widgets = {
-            'nombre': forms.TextInput(
-                attrs = {
-                    'placeholder': 'Nombre...',
-                    'class': 'form-control',
-                }
-            ),
-             'categoria': forms.Select(
-                attrs = {
-                    'placeholder': 'Categoria...',
-                    'class': 'form-control',
-                }
-            ),
-            
-            'descripcion': forms.Textarea(
-                attrs = {
-                    'placeholder': 'Descripcion del producto',
-                    'rows': '3',
-                    'class': 'form-control',
-                }
-            ),
-            'unidad': forms.Select(
-                attrs = {
-                    'class': 'form-control',
-                }
-            ),
-            'cantidad': forms.NumberInput(
-                attrs = {
-                    'placeholder': 'Codigo de barras',
-                    'class': 'form-control',
-                }
-            ),
-            'precio_compra': forms.NumberInput(
-                attrs = {
-                    'placeholder': '1',
-                    'class': 'form-control',
-                }
-            ),
-            'precio_venta': forms.NumberInput(
-                attrs = {
-                    'placeholder': '1',
-                    'class': 'form-control',
-                }
-            ),
+            'nombre': forms.TextInput(attrs={
+                'placeholder': 'Nombre...',
+                'class': 'form-control',
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'placeholder': 'Descripción del producto',
+                'rows': '3',
+                'class': 'form-control',
+            }),
+            'unidad': forms.Select(attrs={'class': 'form-control'}),
+            'cantidad': forms.NumberInput(attrs={
+                'step': '0.01',  # ✅ permite hasta 2 decimales
+                'class': 'form-control',
+                'placeholder': 'Cantidad (ej. 2.50)',
+            }),
+            'precio_compra': forms.NumberInput(attrs={
+                'step': '0.01',  # ✅ dos decimales
+                'class': 'form-control',
+                'placeholder': 'Precio de compra (ej. 12.50)',
+            }),
+            'precio_venta': forms.NumberInput(attrs={
+                'step': '0.01',  # ✅ dos decimales
+                'class': 'form-control',
+                'placeholder': 'Precio de venta (ej. 15.90)',
+            }),
         }
-    # validations
-    
-    
+
+    # ✅ Limpieza para aceptar coma o punto decimal en campos numéricos
+    def clean_cantidad(self):
+        valor = str(self.cleaned_data['cantidad']).replace(',', '.')
+        return float(valor)
+
     def clean_precio_compra(self):
-        precio_compra = self.cleaned_data['precio_compra']
-        if not precio_compra > 0:
-            raise forms.ValidationError('Ingrese un precio compra mayor a cero')
+        valor = str(self.cleaned_data['precio_compra']).replace(',', '.')
+        valor = float(valor)
+        if valor <= 0:
+            raise forms.ValidationError('Ingrese un precio de compra mayor a cero.')
+        return valor
 
-        return precio_compra
-    
     def clean_precio_venta(self):
-        precio_venta = self.cleaned_data['precio_venta']
-        precio_compra = self.cleaned_data.get('precio_compra')
-        if not precio_venta >= precio_compra:
-            raise forms.ValidationError('El precio de venta debe ser mayor o igual que el precio de compra')
-
-        return precio_venta
+        valor = str(self.cleaned_data['precio_venta']).replace(',', '.')
+        valor = float(valor)
+        precio_compra = float(str(self.cleaned_data.get('precio_compra')).replace(',', '.'))
+        if valor < precio_compra:
+            raise forms.ValidationError('El precio de venta debe ser mayor o igual que el precio de compra.')
+        return valor

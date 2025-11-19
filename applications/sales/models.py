@@ -1,5 +1,6 @@
+from decimal import Decimal
 from django.db import models
-from django.db.models import Sum, F, FloatField
+from django.db.models import Sum, F, FloatField, DecimalField
 from django.conf import settings
 from applications.product.models import Producto
 from applications.customers.models import Cliente
@@ -27,14 +28,14 @@ class Venta(models.Model):
         utilidad = self.detalles.aggregate(
             total=Sum(
                 (F('VD_Precio') - F('producto__precio_compra')) * F('VD_Cantidad'),
-                output_field=FloatField()
+                output_field=DecimalField(max_digits=12, decimal_places=2)
             )
         )
         return utilidad['total'] or 0
 
     @property
     def total(self):
-        return sum(d.subtotal for d in self.detalles.all())
+        return sum((d.subtotal for d in self.detalles.all()), Decimal('0.00'))
 
     objects=VentaManagers()
 

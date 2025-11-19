@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+
+    <!-- Título centrado con estilo corporativo -->
+    <h2 class="text-center fw-bold mb-4" 
+        style="color: #0a4d0a; font-size: 2rem;">
+        Panel de Control
+    </h2>
+
+    <!-- Card principal -->
+    <div class="card shadow-sm border-0" style="border-radius: 0.75rem;">
+        <div class="card-body py-4">
+
+            <h4 class="fw-semibold mb-3" style="color: #0a4d0a;">
+                Saldo Global:
+            </h4>
+
+            <!-- Monto grande centrado -->
+            <p class="text-center fw-bold"
+               style="font-size: 2.5rem; color: #b30000;">
+                S/ {{ saldo_global }}
+            </p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

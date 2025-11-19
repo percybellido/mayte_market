@@ -16,6 +16,7 @@
 <body>
     <header class="hero" style="background-image: url('{% static "img/fondo1.jpg" %}');">
         <nav class="navbar encabezado navbar-expand-lg bg-body-tertiary">
+            <div class="navbar-backdrop d-none"></div>
             <div class="container-fluid menu">
                 <a class="navbar-brand mb-0" href="#">Romina's Market</a>
            
@@ -51,15 +52,16 @@
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="ventasDropdown">
                                     <li><a class="dropdown-item" href="{% url 'cliente_app:lista-clientes' %}">Listar Clientes</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'venta_app:ganancias' %}">Utilidades</a></li>
                                     <li><a class="dropdown-item" href="{% url 'producto_app:producto-lista' %}">Lista de Productos</a></li>
                                     <li><a class="dropdown-item" href="{% url 'venta_app:venta-index' %}">Vender</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'venta_app:saldo_total' %}">Saldo Total</a></li>
                                     <li>
                                         {% if cliente_en_sesion %}
                                             <a class="dropdown-item" href="{% url 'cliente_app:historial_cliente' cliente_en_sesion.id %}">
                                                 Ver historial {{ cliente_en_sesion.Cli_Nombre }}
                                             </a>
-                                        {% else %}
-                                            <span class="dropdown-item text-muted">Sin cliente</span>
+                                        
                                         {% endif %}
                                     </li>
                                 </ul>

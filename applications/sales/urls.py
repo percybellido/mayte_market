@@ -40,4 +40,8 @@ urlpatterns = [
     path('registrar-abono/', views.RegistrarAbonoView.as_view(), name='registrar_abono'),
     path('confirmar-venta/', views.ConfirmarVentaView.as_view(), name='confirmar_venta'),
     path("venta/<int:pk>/", views.VentaDetailView.as_view(), name="venta-detalle"),
+    
+    path('venta/ganancias/', views.GananciasUltimosDiasView.as_view(), name='ganancias'),
+    path("saldo-total/", views.SaldoTotalView.as_view(), name="saldo_total"),
+
 ]

@@ -1,60 +1,81 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2 class="text-center">Utilidad de ventas del cliente: {{ cliente.nombre }}</h2>
+<div class="container my-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="text-center mb-4">Utilidad de ventas del cliente: {{ cliente.nombre }}</h2>
 
-<p><strong>Utilidad acumulada:</strong> {{ utilidad_acumulada|floatformat:2 }}</p>
+      <p class="text-center fs-5">
+        <strong>Utilidad acumulada:</strong>
+        <span class="text-success">{{ utilidad_acumulada|floatformat:2 }}</span>
+      </p>
 
-<table class="table fuente table-dark table-hover mb-0 px-1">
-    <thead>
-    <tr>
-      <th>Fecha</th>
-      <th>Monto de la Venta</th>
-      <th>Utilidad de la Venta</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for venta in ventas %}
-      <tr>
-        <td>{{ venta.Venta_Fecha|date:"d/m/y" }}</td>
-        <td>{{ venta.monto_total|floatformat:2 }}</td>
-        <td>{{ venta.utilidad_total|floatformat:2 }}</td>
-      </tr>
-    {% empty %}
-      <tr>
-        <td colspan="3">No hay ventas registradas</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+      <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Monto de la Venta</th>
+              <th>Utilidad de la Venta</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for venta in ventas %}
+              <tr>
+                <td>{{ venta.Venta_Fecha|date:"d/m/y" }}</td>
+                <td>{{ venta.monto_total|floatformat:2 }}</td>
+                <td>{{ venta.utilidad_total|floatformat:2 }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="3" class="text-center">No hay ventas registradas</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
-<!-- Menú de paginación -->
-    {% if is_paginated %}
-      <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-          {% if page_obj.has_previous %}
-            <li class="page-item ">
-              <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
-            </li>
-          {% else %}
-            <li class="page-item disabled">
-              <a class="page-link" href="#" tabindex="-1">&laquo;</a>
-            </li>
-          {% endif %}
-          {% for i in paginator.page_range %}
-            <li class="page-item {% if page_obj.number == i %}active{% endif %}">
-              <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-            </li>
-          {% endfor %}
-          {% if page_obj.has_next %}
-            <li class="page-item ">
-              <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
-            </li>
-          {% else %}
-            <li class="page-item disabled">
-              <a class="page-link" href="#" tabindex="-1">&raquo;</a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-    {% endif %}
+      <!-- Botón de regreso -->
+      <div class="d-flex justify-content-center justify-content-md-end mt-4">
+        <a href="{% url 'cliente_app:lista-clientes' %}" class="btn-volver">
+            ⬅ Volver al Dashboard
+        </a>
+
+      </div>
+
+      <!-- Paginación -->
+      {% if is_paginated %}
+        <nav aria-label="Page navigation" class="mt-4">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+              </li>
+            {% endif %}
+
+            {% for i in paginator.page_range %}
+              <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+              </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
 {% endblock %}

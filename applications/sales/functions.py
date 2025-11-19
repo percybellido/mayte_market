@@ -1,7 +1,8 @@
 from django.utils import timezone
+from datetime import timedelta
 from applications.customers.models import Cliente
 from datetime import datetime
-from django.db.models import Sum
+from django.db.models import Sum, DecimalField, F
 from applications.product.models import Producto
 
 from .models import Venta, VentaDetalle, CarShop, Pago, PagoVenta
@@ -99,3 +100,34 @@ def registrar_pago(cliente, total_pagado, metodo_pago):
             restante -= abono
             if restante <= 0:
                 break
+
+def ganancia_total_por_dia(fecha=None):
+    """Devuelve la ganancia total de todas las ventas en la fecha indicada."""
+    if fecha is None:
+        fecha = timezone.now().date()  # Por defecto, usa el día actual
+
+    resultado = VentaDetalle.objects.filter(
+        VD_VentasId__Venta_Fecha__date=fecha
+    ).aggregate(
+        total=Sum(
+            (F('VD_Precio') - F('producto__precio_compra')) * F('VD_Cantidad'),
+            output_field=DecimalField(max_digits=12, decimal_places=2)
+        )
+    )
+    return resultado['total'] or 0
+
+def ganancias_ultimos_dias(dias=7):
+    """Devuelve una lista con la ganancia de los últimos 'dias' días."""
+    hoy = timezone.now().date()
+    datos = []
+
+    for i in range(dias):
+        fecha = hoy - timedelta(days=i)
+        utilidad = ganancia_total_por_dia(fecha)
+        datos.append({
+            'fecha': fecha,
+            'ganancia': utilidad
+        })
+
+    return datos[::-1] 
+

@@ -36,7 +36,7 @@ class Producto(models.Model):
     nombre = models.CharField('Nombre', max_length=40)
     descripcion = models.TextField('Descripcion del producto', blank=True)
     unidad = models.CharField('Unidad de medida', max_length=1, choices=UNIT_CHOICES)
-    cantidad = models.PositiveBigIntegerField('Cantidad en Almacen', default=0)
+    cantidad = models.DecimalField('Cantidad en Almacen', max_digits=12, decimal_places=3, default=0)
     precio_compra = models.DecimalField('Precio de Compra', max_digits=7, decimal_places=2)
     slug = models.SlugField(blank=True, unique=True, null=True)  # 🔹 por ahora sin unique
     precio_venta = models.DecimalField('Precio de Venta', max_digits=7, decimal_places=2)
