@@ -373,20 +373,23 @@ a .navbar-brand{
         top: 70px; /* Debajo del botón hamburguesa */
         left: 50%;
         transform: translateX(-50%);
-        width: 85%;           /* Tamaño ideal, no toda la pantalla */
-        max-height: 90vh;     /* Nunca se corta */
+        width: 65%;           /* Tamaño ideal, no toda la pantalla */
+        max-height: none !important;   /* deja crecer todo el menú */     /* Nunca se corta */
+        height: auto !important;
+        overflow: visible !important;  /* permite que los dropdowns expandan */
         overflow-y: auto;     /* Solo aparece scroll si es necesario */
         background: rgba(0, 128, 0, 0.95);
         backdrop-filter: blur(5px);
         border-radius: 15px;
         padding: 1.5rem;
-        z-index: 9999;
+        z-index: 10001 !important;
+        pointer-events: auto;
         box-shadow: 0 8px 25px rgba(0,0,0,0.30);
     }
 
     /* Botón hamburguesa */
     .navbar-toggler {
-        z-index: 10000; /* Encima del menú */
+        z-index: 10000 !important;
         border: none;
         background: rgba(0,0,0,0.15);
         border-radius: 8px;
@@ -395,6 +398,8 @@ a .navbar-brand{
 
     /* Enlaces del menú */
     .navbar-nav .nav-link {
+        position: relative;
+        z-index: 10002 !important;
         color: #ffffff !important;
         font-weight: 600;
         padding: 10px 0;
@@ -404,19 +409,33 @@ a .navbar-brand{
 
     /* Dropdown dentro del menú */
     .dropdown-menu {
-        position: static;
-        float: none;
-        background: rgba(0,128,0,0.90);
-        text-align: center;
-        border-radius: 10px;
-        margin-top: .5rem;
+        position: relative !important;
+        display: block !important;    /* se comporta como una lista clásica */
+        background-color: rgba(0, 128, 0, 0.95) !important;
+        border: none;
+        box-shadow: none;
+        z-index: 10003 !important;
+        margin-left: 1.5rem;           /* jerarquía visual */
+        width: auto;
     }
 
-    .dropdown-item {
-        color: white !important;
-        font-weight: 600;
+    /* controla el dropdown cuando está abierto */
+    .dropdown-menu.show {
+        display: block !important;  /* solo cuando Bootstrap lo abre */
     }
-   
+
+    /* controla el dropdown cuando está cerrado */
+    .dropdown-menu:not(.show) {
+        display: none !important;   /* cerrado correctamente */
+    }
+
+    /* estilo interno */
+    .dropdown-item {
+        white-space: normal !important;
+        color: #fff !important;
+    }
+        
+    
 }
 
 .hamburger-btn {
