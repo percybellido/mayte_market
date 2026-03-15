@@ -13,6 +13,10 @@ class Venta(models.Model):
     Venta_cantidad=models.DecimalField('Cantidad de Producto', max_digits=10, decimal_places=2, default=0)
     Venta_NroFact = models.CharField('Número de Boleta', max_length=20, null=True, blank=True)
     Venta_Total=models.DecimalField('Total', max_digits=10, decimal_places=2)
+    anulate = models.BooleanField(
+        'Venta Anulada',
+        default=False,
+    )
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(

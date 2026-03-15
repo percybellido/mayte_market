@@ -271,7 +271,22 @@ class VentaDetailView(DetailView):
         venta = self.get_object()
         context["detalles"] = venta.detalles.all()  # relacionados por related_name en VentaDetalle
         return context
+    
+class VentaDeleteView(VentasPermisoMixin, DeleteView):
+    template_name = "sales/delete.html"
+    model = Venta
+    success_url = reverse_lazy('venta_app:venta-index')
 
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.anulate = True
+        self.object.save()
+        # actualizmos sl stok y ventas
+        VentaDetalle.objects.restablecer_stock_num_ventas(self.object.id)
+        success_url = self.get_success_url()
+
+        return HttpResponseRedirect(success_url)
+    
 class GananciasUltimosDiasView(TemplateView):
     template_name = "sales/ganancias_ultimos_dias.html"
 
