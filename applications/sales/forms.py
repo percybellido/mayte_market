@@ -6,18 +6,21 @@ from .models import Venta
 
 class VentaForm(forms.Form):
     cliente = forms.ModelChoiceField(
-        queryset=Cliente.objects.all(),
+        queryset=Cliente.objects.all().order_by('nombre'),
         label='Cliente',
         widget=forms.Select(attrs={
             'class': 'form-control select-cliente',
-        })
+            'id':'cliente'
+        }),
+        required=False
     )
     
     producto = forms.ModelChoiceField(
-        queryset=Producto.objects.all(),
+        queryset=Producto.objects.all().order_by('nombre'),
         label='Producto',
         widget=forms.Select(attrs={
             'class': 'form-control select-producto',
+            'id':'producto'
         })
     )
     
@@ -27,8 +30,9 @@ class VentaForm(forms.Form):
         decimal_places=2,
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
-            'step': 'any',
-            'placeholder': 'Cantidad'
+            'step': '0.01',
+            'placeholder': 'Cantidad',
+            'id':'cantidad'
         })
     )
 
@@ -45,7 +49,8 @@ class VentaForm(forms.Form):
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
             'step': 'any',
-            'placeholder': 'Precio unitario'
+            'placeholder': 'Precio unitario',
+            'id':'precio'
         })
     )
 

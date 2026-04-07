@@ -1,0 +1,50 @@
+<table class="table table-hover align-middle">
+    <thead>
+    <tr>
+        <th>Nombres</th>
+        <th>Precio (S/)</th>
+        <th>Cantidad</th>
+        <th colspan="3" class="text-center">Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for product in productos %}
+        <tr>
+        <td>{{ product.producto }}</td>
+        <td>{{ product.precio|floatformat:2 }}</td>
+        <td>{{ product.cantidad|floatformat:2 }}</td>
+
+        <td class="text-center">
+            <form action="{% url 'venta_app:carshop-add' product.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-info btn-sm">
+                <i class="bi bi-plus"></i>
+            </button>
+            </form>
+        </td>
+
+        <td class="text-center">
+            <form action="{% url 'venta_app:carshop-update' product.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="bi bi-dash"></i>
+            </button>
+            </form>
+        </td>
+
+        <td class="text-center">
+            <form action="{% url 'venta_app:carshop-delete' product.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">
+                <i class="bi bi-x"></i>
+            </button>
+            </form>
+        </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+ <div class="alert alert-success text-center">
+    <h5>Total a Cobrar: S/ {{ total_cobrar }}</h5>
+</div>

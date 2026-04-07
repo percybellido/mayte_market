@@ -29,3 +29,6 @@ mayte_market/settings/local.py
 # Archivos de sistema
 .DS_Store
 Thumbs.db
+
+#Archivos Media
+media/

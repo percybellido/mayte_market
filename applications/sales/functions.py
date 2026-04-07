@@ -28,51 +28,115 @@ def generar_nro_factura():
 
     return f"{prefijo}-{nuevo_num:06d}"
 
-def procesar_venta(self, **params_venta):
+def aplicar_saldo_a_favor(cliente, venta):
+    """
+    Aplica el saldo a favor del cliente como pago automático.
+    """
+    saldo = cliente.saldo_pendiente   # puede ser negativo
 
-    # recupera la lista de productos en el carrito
-    productos_en_car=CarShop.objects.all()
+    if saldo >= 0:
+        return  # no hay saldo a favor
 
-    if productos_en_car.exists() > 0:
+    saldo_a_favor = abs(saldo)
 
-        #Crea el objeto venta
-        cliente=Cliente.objects.get(id=params_venta['cliente_id'])
+    
+    monto_a_usar = min(saldo_a_favor, venta.Venta_Total)
 
-        venta=Venta.objects.create(
+    PagoVenta.objects.create(
+        venta=venta,
+        monto_pagado=monto_a_usar,
+        descripcion="Aplicación automática de saldo a favor"
+    )
+
+    cliente.actualizar_saldo()
+
+from django.db import transaction
+from django.db.models import F
+from django.utils import timezone
+
+
+def procesar_venta(user, cliente_id):
+    from decimal import Decimal
+    
+    # 🔹 carrito SOLO del usuario actual
+    productos_en_car = CarShop.objects.select_related('producto').filter(
+    user=user, 
+    cliente_id=cliente_id)
+
+    if not productos_en_car.exists():
+        raise ValueError("El carrito esta vacio")
+
+    with transaction.atomic():
+
+        cliente = Cliente.objects.get(id=cliente_id)
+
+        # 🔥 1. VALIDAR STOCK ANTES DE TODO
+        for item in productos_en_car:
+            if item.cantidad > item.producto.cantidad:
+                raise ValueError(
+                    f"Stock insuficiente para {item.producto.nombre}"
+                )
+
+        venta = Venta.objects.create(
             Venta_Fecha=timezone.now(),
             Venta_CliId=cliente,
             Venta_cantidad=0,
             Venta_NroFact=generar_nro_factura(),
             Venta_Total=0,
+            user=user,
+            status='confirmed'  # opcional, pero recomendado
         )
 
-        ventas_detalle=[]
-        total=0
-        productos_en_venta=[]
-        cantidad_total=0
+        ventas_detalle = []
+        total = 0
+        cantidad_total = 0
 
-        for producto_car in productos_en_car:
-            subtotal=producto_car.cantidad*producto_car.precio_venta
-            venta_detalle=VentaDetalle(
-                producto=producto_car.producto,
-                venta=producto_car.VD_VentasId,
-                cantidad=producto_car.VD_Cantidad,
-                precio_venta=producto_car.precio_venta
+        for item in productos_en_car:
+            producto = item.producto
+            cantidad_item = Decimal(str(item.cantidad))
+            updated = Producto.objects.filter(
+                id=producto.id,
+                cantidad__gte=item.cantidad
+            ).update(
+                cantidad=F('cantidad') - cantidad_item
             )
-            producto=producto_car.producto
-            ventas_detalle.append(venta_detalle)
-            productos_en_venta.append(producto)
-        venta.save()
+            
+
+            if updated == 0:
+                raise ValueError(f"Stock insuficiente para {producto.nombre}")
+
+            subtotal = item.cantidad * item.precio
+
+            ventas_detalle.append(
+                VentaDetalle(
+                    VD_VentasId=venta,
+                    producto=producto,
+                    VD_Cantidad=item.cantidad,
+                    VD_Precio=item.precio,
+                    VD_precio_compra=producto.precio_compra
+                )
+            )
+
+            total += subtotal
+            cantidad_total += item.cantidad
+
+        # 🔹 guardar detalles en lote
         VentaDetalle.objects.bulk_create(ventas_detalle)
-        #Completada la vente, eliminamos productos del Carrito
+
+        # 🔹 actualizar totales
+        venta.Venta_Total = total
+        venta.Venta_cantidad = cantidad_total
+        venta.save()
+
+        # 🔹 limpiar carrito SOLO de este usuario
         productos_en_car.delete()
+
         return venta
-    else:
-        return None
     
 def registrar_pago(cliente, total_pagado, metodo_pago):
     ventas_pendientes = Venta.objects.filter(
-        Venta_CliId=cliente
+        Venta_CliId=cliente,
+        status='confirmed'
     ).order_by('Venta_Fecha')
 
     with transaction.atomic():
@@ -101,20 +165,22 @@ def registrar_pago(cliente, total_pagado, metodo_pago):
             if restante <= 0:
                 break
 
-def ganancia_total_por_dia(fecha=None):
-    """Devuelve la ganancia total de todas las ventas en la fecha indicada."""
-    if fecha is None:
-        fecha = timezone.now().date()  # Por defecto, usa el día actual
 
-    resultado = VentaDetalle.objects.filter(
-        VD_VentasId__Venta_Fecha__date=fecha
+        cliente.actualizar_saldo()
+    
+def ganancia_total_por_dia(fecha):
+
+    utilidad = VentaDetalle.objects.filter(
+        VD_VentasId__Venta_Fecha__date=fecha,
+        VD_VentasId__status='confirmed'
     ).aggregate(
         total=Sum(
-            (F('VD_Precio') - F('producto__precio_compra')) * F('VD_Cantidad'),
+            (F('VD_Precio') - F('VD_precio_compra')) * F('VD_Cantidad'),
             output_field=DecimalField(max_digits=12, decimal_places=2)
         )
-    )
-    return resultado['total'] or 0
+    )['total'] or 0
+
+    return utilidad
 
 def ganancias_ultimos_dias(dias=7):
     """Devuelve una lista con la ganancia de los últimos 'dias' días."""

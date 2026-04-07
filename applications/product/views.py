@@ -20,7 +20,7 @@ class ProductListView(ListView):
 
     def get_queryset(self):
         kword=self.request.GET.get("kword", '')
-        order=self.request.GET.get("order", '')
+        order=self.request.GET.get("order") or  "nombre"
         queryset=Producto.objects.buscar_producto(kword, order)
         return queryset
     

@@ -4,19 +4,22 @@ from django.db.models import Sum, F, FloatField, DecimalField
 from django.conf import settings
 from applications.product.models import Producto
 from applications.customers.models import Cliente
-from .managers import VentaManagers, CarShopManager
+from applications.users.models import User
+from .managers import VentaManagers, CarShopQuerySet
 
 # Create your models here.
 class Venta(models.Model):
+    STATUS_CHOICES = (
+        ('draft', 'Borrador'),
+        ('confirmed', 'Confirmada'),
+        ('cancelled', 'Anulada'),
+    )
     Venta_Fecha=models.DateTimeField('Fecha de Venta')
     Venta_CliId=models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='cliente_venta', null=False)
     Venta_cantidad=models.DecimalField('Cantidad de Producto', max_digits=10, decimal_places=2, default=0)
     Venta_NroFact = models.CharField('Número de Boleta', max_length=20, null=True, blank=True)
     Venta_Total=models.DecimalField('Total', max_digits=10, decimal_places=2)
-    anulate = models.BooleanField(
-        'Venta Anulada',
-        default=False,
-    )
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(
@@ -28,14 +31,15 @@ class Venta(models.Model):
 
     @property
     def ganancia_total(self):
-        """Calcula la utilidad de esta venta a partir de sus detalles"""
-        utilidad = self.detalles.aggregate(
+        if self.status != 'confirmed':
+            return Decimal("0.00")
+
+        return self.detalles.aggregate(
             total=Sum(
                 (F('VD_Precio') - F('producto__precio_compra')) * F('VD_Cantidad'),
                 output_field=DecimalField(max_digits=12, decimal_places=2)
             )
-        )
-        return utilidad['total'] or 0
+        )['total'] or Decimal("0.00")
 
     @property
     def total(self):
@@ -45,7 +49,12 @@ class Venta(models.Model):
 
     class Meta:
         verbose_name='Ventas'
-        ordering=['-Venta_CliId']
+        ordering = ['-created']
+        indexes = [
+        models.Index(fields=['user', 'Venta_Fecha']),
+        models.Index(fields=['Venta_CliId']),
+        models.Index(fields=['status']),
+    ]
 
     def __str__(self):
         return str(self.Venta_CliId)
@@ -60,6 +69,7 @@ class VentaDetalle(models.Model):
     )
     VD_Cantidad = models.DecimalField('Cantidad', max_digits=10, decimal_places=2, default=0)
     VD_Precio=models.DecimalField('Precio Venta', max_digits=10, decimal_places=2)
+    VD_precio_compra=models.DecimalField(max_digits=10, decimal_places=2)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -93,19 +103,7 @@ class Pago(models.Model):
     metodo_pago = models.ForeignKey(MetodosPago, on_delete=models.SET_NULL, null=True)
     saldo_despues = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # 👈 nuevo campo
 
-    def save(self, *args, **kwargs):
-        # Primero actualizamos el saldo del cliente
-        nuevo_saldo = self.cliente.saldo_pendiente - self.total_pagado
-        # Importante: guardamos el nuevo saldo al cliente
-        self.cliente.saldo = nuevo_saldo
-        self.cliente.save(update_fields=["saldo"])
-
-        # Ahora asignamos saldo_despues ANTES de guardar el pago
-        self.saldo_despues = nuevo_saldo
-
-        # Y recién aquí guardamos el pago
-        super().save(*args, **kwargs)
-
+    
     def __str__(self):
         return f"Pago de {self.cliente} - S/ {self.total_pagado}"
 
@@ -154,10 +152,16 @@ class CarShop(models.Model):
     decimal_places=2,
     default=0
     )
+    user = models.ForeignKey(
+    User,
+    on_delete=models.CASCADE,
+    null=True,      # << IMPORTANTE
+    blank=True,     # << IMPORTANTE
+    )
     precio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    objects=CarShopManager()
+    objects = CarShopQuerySet.as_manager()
     
     class Meta:
         verbose_name = 'Carrito de compras'
@@ -165,4 +169,4 @@ class CarShop(models.Model):
         ordering = ['-created']
 
     def __str__(self):
-        return str(self.product.name)
+        return str(self.producto.nombre)

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.views.generic import ListView, TemplateView, DetailView
-
+from django.http import JsonResponse
 from .models import Cliente
 from applications.sales.models import Pago, HistorialSaldo, VentaDetalle
 
@@ -28,7 +28,7 @@ class HistorialVentasCliente(DetailView):
         # mostrar solo las 20 ventas más recientes
         context['ultimas_ventas'] = (
             self.object.cliente_venta.all()
-            .order_by('-Venta_Fecha')[:20]
+            .order_by('-Venta_Fecha')[:209]
         )
         return context
 
@@ -44,7 +44,7 @@ class HistorialClienteView(ListView):
     def get_queryset(self):
         return HistorialSaldo.objects.filter(
             cliente_id=self.kwargs["pk"]
-        ).order_by("fecha")
+        ).order_by("-fecha")[:20]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -89,7 +89,7 @@ class HistorialClienteUtilidad(ListView):
                     output_field=FloatField()
                 )
             )
-            .order_by('-Venta_Fecha')
+            .order_by('-Venta_Fecha')[:20]
         )
 
     def get_context_data(self, **kwargs):
@@ -104,7 +104,22 @@ class HistorialClienteUtilidad(ListView):
         context["utilidad_acumulada"] = utilidad_acumulada
         return context
 
+def buscar_clientes(request):
+    term = request.GET.get('q') or ''
 
+    clientes = Cliente.objects.filter(
+        nombre__icontains=term
+    ).order_by('nombre')[:20]  # límite para rendimiento
+
+    data = [
+        {
+            "id": cliente.id,
+            "text": f"{cliente.nombre}"
+        }
+        for cliente in clientes
+    ]
+
+    return JsonResponse(data, safe=False)
     
 
 

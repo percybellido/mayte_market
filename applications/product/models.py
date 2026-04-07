@@ -53,6 +53,7 @@ class Producto(models.Model):
     objects = ProductManager()
 
     class Meta:
+        ordering=['nombre']
         verbose_name = 'Producto'
         verbose_name_plural = 'Productos'
 

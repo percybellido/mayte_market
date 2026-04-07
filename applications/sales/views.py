@@ -12,12 +12,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.utils.timezone import now
 
-from .models import Venta, VentaDetalle, CarShop, PagoVenta, Pago
+from .models import Venta, VentaDetalle, CarShop, PagoVenta, Pago, HistorialSaldo
 from .forms import VentaForm, PagoForm, AbonoForm
 from .functions import procesar_venta, ganancia_total_por_dia, ganancias_ultimos_dias
-
+from decimal import Decimal, ROUND_HALF_UP
 from .functions import registrar_pago
-
+import json
 from django.db import transaction
 
 class AddCarView(VentasPermisoMixin, FormView):
@@ -35,12 +35,28 @@ class AddCarView(VentasPermisoMixin, FormView):
     def get_context_data(self, **kwargs):
        
         context = super().get_context_data(**kwargs)
-        productos = CarShop.objects.all()
-        context["productos"] = productos
-        context["total_cobrar"] = CarShop.objects.total_cobrar()
-        context["ganancia"] = CarShop.objects.ganancia()
-        # Si hay cliente en sesión, mostrarlo
+
         cliente_id = self.request.session.get('cliente_id')
+        if cliente_id:
+            productos = CarShop.objects.filter(
+                cliente_id=cliente_id,
+                user=self.request.user
+            ).select_related('producto')
+        else:
+            productos = CarShop.objects.none()
+
+        context["productos"] = productos
+        context["stock_json"] = json.dumps([
+            {
+                "id": p["id"],
+                "cantidad": float(p["cantidad"])  # 🔥 aquí está la clave
+            }
+            for p in Producto.objects.values("id", "cantidad")
+        ])
+        context["total_cobrar"] = productos.total_cobrar()
+        context["ganancia"] = productos.ganancia()
+        # Si hay cliente en sesión, mostrarlo
+        
         context["cliente"] = Cliente.objects.get(id=cliente_id) if cliente_id else None
         return context
     
@@ -57,10 +73,7 @@ class AddCarView(VentasPermisoMixin, FormView):
         cantidad = form.cleaned_data['cantidad']
         precio_unitario = form.cleaned_data.get('precio_unitario') or producto.precio_venta
 
-        # Guardar cliente en sesión si no existe
-        if 'cliente_id' not in self.request.session:
-            self.request.session['cliente_id'] = cliente.id
-
+        
         # Obtener cliente desde la sesión
         cliente_id = self.request.session['cliente_id']
         cliente = Cliente.objects.get(id=cliente_id)
@@ -68,6 +81,7 @@ class AddCarView(VentasPermisoMixin, FormView):
         obj, created = CarShop.objects.get_or_create(
             producto=producto,
             cliente=cliente,
+            user=self.request.user,
             defaults={
                 'cantidad': cantidad,
                 'precio' : precio_unitario,
@@ -75,12 +89,30 @@ class AddCarView(VentasPermisoMixin, FormView):
         )
         #
         if not created:
-            obj.cantidad = obj.cantidad + cantidad
+            nueva_cantidad = obj.cantidad + cantidad
+
+            # 🔥 VALIDAR STOCK ANTES DE SUMAR
+            if nueva_cantidad > producto.cantidad:
+                messages.error(
+                    self.request,
+                    f"Stock insuficiente. Disponible: {producto.cantidad}"
+                )
+
+                if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    context = self.get_context_data()
+                    context['form'] = self.form_class()
+                    return render(self.request, 'sales/partials/carrito.html', context)
+
+                return self.form_invalid(form)
+
+            obj.cantidad = nueva_cantidad
             obj.precio = precio_unitario
             obj.save()
 
-        obj.precio = precio_unitario
-        obj.save()
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            context = self.get_context_data()
+            context['form'] = self.form_class()
+            return render(self.request, 'sales/partials/carrito.html', context)
 
         return super(AddCarView, self).form_valid(form)
     
@@ -131,25 +163,31 @@ class CarShopDeleteAll(VentasPermisoMixin, View):
             )
         )
 
+
+
 class ProcesoVentaSimpleView(VentasPermisoMixin, View):
-    """ Procesa una venta simple """
 
     def post(self, request, *args, **kwargs):
-        cliente = request.POST.get('cliente_id')  # El id del cliente debe venir en el POST
-        if not cliente:
-            return HttpResponseRedirect(reverse('venta_app:venta-index'))
-        #
-        procesar_venta(
-            self=self,
-            user=self.request.user,
-        )
-        #
-        return HttpResponseRedirect(
-            reverse(
-                'venta_app:venta-index'
-            )
-        )
+        print("se esta usando proceso simple")
+        cliente_id = request.POST.get('cliente_id')
 
+        if not cliente_id:
+            messages.error(request, "Debe seleccionar un cliente")
+            return HttpResponseRedirect(reverse('venta_app:venta-index'))
+
+        try:
+            procesar_venta(
+                user=request.user,
+                cliente_id=cliente_id
+            )
+            messages.success(request, "Venta realizada correctamente")
+
+        except ValueError as e:
+            messages.error(request, str(e))
+
+        return HttpResponseRedirect(
+            reverse('venta_app:venta-index')
+        )
 
 def ventas(request):
     return render(request, 'sales/ventas.html')
@@ -181,13 +219,34 @@ class RegistrarAbonoView(FormView):
     form_class = AbonoForm
     success_url = reverse_lazy('venta_app:venta-index')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cliente_id = self.kwargs.get('cliente_id')
+
+        if cliente_id:
+            context['cliente_seleccionado'] = Cliente.objects.get(id=cliente_id)
+
+        return context
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        cliente_id = self.kwargs.get('cliente_id')
+
+        if cliente_id:
+            initial['cliente'] = Cliente.objects.get(id=cliente_id)
+
+        return initial
+
     def form_valid(self, form):
-        cliente = form.cleaned_data['cliente']
+        cliente_id = self.kwargs.get('cliente_id')
+        cliente = (
+            Cliente.objects.get(id=cliente_id)
+            if cliente_id
+            else form.cleaned_data['cliente']
+        )
+
         monto = form.cleaned_data['monto']
         metodo_pago = form.cleaned_data['metodo_pago']
-        print("Cliente recibido:", form.cleaned_data.get("cliente"))
-        print("Método pago recibido:", form.cleaned_data.get("metodo_pago"))
-        print("Monto:", form.cleaned_data.get("monto"))
 
         with transaction.atomic():
             pago = Pago.objects.create(
@@ -196,23 +255,54 @@ class RegistrarAbonoView(FormView):
                 metodo_pago=metodo_pago
             )
 
-            ventas_pendientes = Venta.objects.filter(Venta_CliId=cliente)
+            monto_restante = Decimal(monto)
 
-            monto_restante = monto
+            ventas_pendientes = (
+                Venta.objects.activas()
+                .filter(Venta_CliId=cliente)
+                .annotate(
+                    total_pagado=Sum('pagos_aplicados__monto_pagado')
+                )
+                .order_by("Venta_Fecha")
+            )
+
             for venta in ventas_pendientes:
-                total_venta = venta.Venta_Total
-                pagado = venta.pagos_aplicados.aggregate(total=Sum('monto_pagado'))['total'] or 0
-                saldo = total_venta - pagado
-                if saldo <= 0:
+
+                total_pagado_venta = (venta.total_pagado or Decimal("0.00")).quantize(Decimal("0.01"))
+
+                saldo_venta = (venta.Venta_Total - total_pagado_venta).quantize(Decimal("0.01"))
+
+                             
+
+
+                if saldo_venta <= 0:
                     continue
-                abono = min(saldo, monto_restante)
-                if abono > 0:
-                    PagoVenta.objects.create(pago=pago, venta=venta, monto_pagado=abono)
-                    monto_restante -= abono
+
+                abono = min(saldo_venta, monto_restante)
+
+                abono = abono.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+                PagoVenta.objects.create(
+                    pago=pago,
+                    venta=venta,
+                    monto_pagado=abono
+                )
+
+                monto_restante = (monto_restante - abono).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
                 if monto_restante <= 0:
                     break
+
             cliente.actualizar_saldo()
-            
+
+            HistorialSaldo.objects.create(
+                cliente=cliente,
+                saldo=cliente.saldo,
+                pago=pago
+            )
+            pago.saldo_despues = cliente.saldo
+            pago.save(update_fields=["saldo_despues"])
+
         return super().form_valid(form)
     
 class ConfirmarVentaView(LoginRequiredMixin, View):
@@ -221,40 +311,42 @@ class ConfirmarVentaView(LoginRequiredMixin, View):
         if not cliente_id:
             return redirect('venta_app:venta-index')  # Redirigir si no hay cliente
 
-        cliente = Cliente.objects.get(id=cliente_id)
-        carrito = CarShop.objects.filter(cliente=cliente)
+        #cliente = Cliente.objects.get(id=cliente_id)
+        #carrito = CarShop.objects.filter(
+            #cliente=cliente,
+            #user=request.user
+        #)
+        
+        #if not carrito.exists():
+            #return redirect('venta_app:venta-index')  # Redirigir si el carrito está vacío
+        try:
+            with transaction.atomic():
+                venta=procesar_venta(
+                    user=request.user,
+                    cliente_id=cliente_id
+                )
 
-        if not carrito.exists():
-            return redirect('venta_app:venta-index')  # Redirigir si el carrito está vacío
+                cliente=Cliente.objects.get(id=cliente_id)
+            
+                # 3. AHORA sí actualizar saldo
+                cliente.actualizar_saldo()
 
-        with transaction.atomic():
-            # Calcular totales
-            total_venta = sum(item.precio * item.cantidad for item in carrito)
-            cantidad_total = sum(item.cantidad for item in carrito)
+                # 4. Guardar historial
+                HistorialSaldo.objects.create(
+                    cliente=cliente,
+                    saldo=cliente.saldo,
+                    venta=venta
+                )
 
-            # Crear la venta
-            venta = Venta.objects.create(
-                Venta_Fecha=now(),
-                Venta_CliId=cliente,
-                Venta_cantidad=cantidad_total,
-                Venta_Total=total_venta,
-                user=request.user  # usuario cajero
-            )
-
-        # Crear los detalles
-        for item in carrito:
-            VentaDetalle.objects.create(
-                VD_VentasId=venta,
-                producto=item.producto,
-                VD_Cantidad=item.cantidad,
-                VD_Precio=item.precio
-            )
-
-        # Limpiar el carrito
-        carrito.delete()
+        except ValueError as e:
+            messages.error(request, str(e))
+            return redirect('venta_app:venta-index')
 
         # Limpiar la sesión del cliente
         del request.session['cliente_id']
+
+        
+        request.session.modified = True  # 🔥 fuerza persistencia
 
         return redirect('venta_app:venta-detalle', pk=venta.pk)  # Redirigir a página principal
     

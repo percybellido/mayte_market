@@ -6,8 +6,15 @@ from django.utils import timezone
 from django.db.models import Sum
 
 from django.db.models import Q, Sum, F, FloatField, ExpressionWrapper
+class VentaQuerySet(models.QuerySet):
 
-class VentaManagers(models.Manager):
+    def activas(self):
+        return self.filter(status='confirmed')
+
+    def anuladas(self):
+        return self.filter(status='cancelled')
+    
+class VentaManagers(models.Manager.from_queryset(VentaQuerySet)):
 
     def listar_ventas(self):
         return self.all()
@@ -29,7 +36,9 @@ class VentaDetalleManager(models.Manager):
             sale__id=id_venta
         )
 
-class CarShopManager(models.Manager):
+class CarShopQuerySet(models.QuerySet):
+
+#class CarShopManager(models.Manager):
 
     def total_cobrar(self):
         consulta=self.aggregate(

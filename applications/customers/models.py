@@ -2,6 +2,8 @@ from django.utils import timezone
 from datetime import date
 from django.db import models
 from django.db.models import Sum, F
+from django.db.models.functions import Coalesce
+from django.db.models import DecimalField, Value
 from .managers import ClienteManager
 
 
@@ -23,15 +25,28 @@ class Cliente(models.Model):
     @property
     def saldo_pendiente(self):
         from django.db.models import Sum
-        from applications.sales.models import PagoVenta
+        from decimal import Decimal
+        from applications.sales.models import Pago
 
-        total_ventas = self.cliente_venta.aggregate(total=Sum('Venta_Total'))['total'] or 0
+        total_ventas = self.cliente_venta.filter(
+            status='confirmed'
+        ).aggregate(
+            total=Sum('Venta_Total')
+        )['total'] or Decimal('0.00')
 
-        total_pagado = PagoVenta.objects.filter(
-            venta__Venta_CliId=self
-        ).aggregate(total=Sum('monto_pagado'))['total'] or 0
+        total_pagado = Pago.objects.filter(
+            cliente=self
+        ).aggregate(
+            total=Sum('total_pagado')
+        )['total'] or Decimal('0.00')
 
-        return total_ventas - total_pagado
+        saldo = total_ventas - total_pagado
+
+        print("ventas:", total_ventas)
+        print("pagos:", total_pagado)
+        print("saldo pendiente:", saldo)
+
+        return saldo
         
    
     
@@ -48,10 +63,14 @@ class Cliente(models.Model):
 
         # Traemos todas las ventas del cliente con su total y lo pagado
         ventas = self.cliente_venta.annotate(
-            pagado=Sum('pagos_aplicados__monto_pagado')
-        ).filter(
-            Venta_Total__gt=F('pagado')  # Solo ventas con deuda
-        ).order_by("Venta_Fecha")
+    pagado=Coalesce(
+        Sum('pagos_aplicados__monto_pagado'),
+        Value(0),
+        output_field=DecimalField()  # 👈 CLAVE
+    )
+).filter(
+    Venta_Total__gt=F('pagado')
+).order_by("Venta_Fecha")
 
         if not ventas.exists():
             return 0
@@ -63,12 +82,12 @@ class Cliente(models.Model):
     def color_alerta(self):
         """Devuelve clase CSS según los días de vencimiento"""
         dias = self.dias_vencidos
-        if dias >= 30:
-            return "vencido-rojo"
-        elif dias > 15:
-            return "vencido-naranja"
-        elif dias > 7:
-            return "vencido-amarillo"
+        if dias >= 13:
+            return "filarojo"
+        elif dias > 10:
+            return "filanaranja"
+        elif dias > 5:
+            return "filaamarillo"
         return ""
 
     class Meta:
@@ -77,4 +96,5 @@ class Cliente(models.Model):
 
     def __str__(self):
         return str(self.id) +' - '+self.nombre
+
 

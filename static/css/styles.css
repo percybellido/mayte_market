@@ -318,17 +318,17 @@ a .navbar-brand{
   background-color: rgb(63, 43, 8); /* marrón más oscuro al pasar */
 }
 
-.filaamarillo {
+.table-dark .filaamarillo td {
   background-color: hsl(45, 100%, 51%) !important; /* amarillo Bootstrap */
   color: #000 !important;
 }
 
-.filanaranja {
+.table-dark .filanaranja td {
   background-color: #fd7e14 !important; /* naranja Bootstrap */
   color: #fff !important;
 }
 
-.filarojo {
+.table-dark .filarojo td {
   background-color: #d31023 !important; /* rojo Bootstrap */
   color: #fff !important;
 }
@@ -434,6 +434,8 @@ a .navbar-brand{
         white-space: normal !important;
         color: #fff !important;
     }
+
+    
         
     
 }
@@ -467,4 +469,25 @@ a .navbar-brand{
         text-align: center;
         margin:1 1 1 1;
     }
+}
+
+.fondo-productos {
+    background: linear-gradient(135deg, #f8f9fa, #e9f5ec);
+}
+
+.producto-card {
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.producto-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.producto-img {
+    height: 180px;
+    object-fit: cover;
+    padding: 10px;
 }

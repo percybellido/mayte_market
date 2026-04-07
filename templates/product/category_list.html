@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+<div class="container-fluid fondo-productos py-4">
 <h2 class="text-center my-4 producto fw-bold">🛒 Nuestros Productos</h2>
 
 <!-- Menú de categorías -->
@@ -27,12 +28,12 @@
 <div class="row g-4 px-4">
     {% for producto in products %}
         <div class="col-6 col-md-3">
-            <div class="card shadow-sm border-0 rounded-3 hover-card h-100">
+            <div class="card producto-card border-0 h-100">
                 <div class="position-relative">
                     {% if producto.image %}
-                        <img src="{{ producto.image.url }}" class="card-img-top p-2 rounded-3" alt="{{ producto.nombre }}">
+                        <img src="{{ producto.image.url }}" class="card-img-top producto-img" alt="{{ producto.nombre }}">
                     {% else %}
-                        <img src="{% static 'img/no-image.jpg' %}" class="card-img-top p-2 rounded-3" alt="Sin imagen">
+                        <img src="{% static 'img/no-image.jpg' %}" class="card-img-top producto-img" alt="Sin imagen">
                     {% endif %}
 
                     <!-- Etiquetas dinámicas -->
@@ -100,6 +101,8 @@
       {% endif %}
     </ul>
   </nav>
+
+</div>
 {% endif %}
 
 {% endblock %}

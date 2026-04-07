@@ -37,7 +37,8 @@ urlpatterns = [
         name='venta-simple',
     ),
     path('pago/registrar/', views.RegistrarPagoView.as_view(), name='registrar-pago'),
-    path('registrar-abono/', views.RegistrarAbonoView.as_view(), name='registrar_abono'),
+    path('abonos/registrar/<int:cliente_id>/', views.RegistrarAbonoView.as_view(), name='registrar-abono'),
+
     path('confirmar-venta/', views.ConfirmarVentaView.as_view(), name='confirmar_venta'),
     path("venta/<int:pk>/", views.VentaDetailView.as_view(), name="venta-detalle"),
     
