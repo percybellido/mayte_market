@@ -57,41 +57,51 @@ class AddCarView(VentasPermisoMixin, FormView):
         context["ganancia"] = productos.ganancia()
         # Si hay cliente en sesión, mostrarlo
         
-        context["cliente"] = Cliente.objects.get(id=cliente_id) if cliente_id else None
+        context["cliente"] = Cliente.objects.filter(id=cliente_id).first() if cliente_id else None
         return context
     
     def form_valid(self, form):
-        if 'cliente_id' not in self.request.session:
-            # Obtener cliente desde el formulario y guardarlo en la sesión
-            cliente = form.cleaned_data['cliente']
+        cliente_id = self.request.session.get('cliente_id')
+
+        # 🔹 Si NO hay cliente en sesión
+        if not cliente_id:
+            cliente = form.cleaned_data.get('cliente')
+
+            if not cliente:
+                messages.error(self.request, "Debe seleccionar un cliente")
+
+                if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    context = self.get_context_data()
+                    context['form'] = form
+                    return render(self.request, 'sales/partials/carrito.html', context)
+
+                return self.form_invalid(form)
+
+            # 🔥 GUARDAR EN SESIÓN (ESTO TE FALTABA)
             self.request.session['cliente_id'] = cliente.id
+
         else:
-            # Si ya está en sesión, recuperarlo de la base de datos
-            cliente_id = self.request.session['cliente_id']
             cliente = Cliente.objects.get(id=cliente_id)
+
+        # 🔹 Datos del producto
         producto = form.cleaned_data['producto']
         cantidad = form.cleaned_data['cantidad']
         precio_unitario = form.cleaned_data.get('precio_unitario') or producto.precio_venta
 
-        
-        # Obtener cliente desde la sesión
-        cliente_id = self.request.session['cliente_id']
-        cliente = Cliente.objects.get(id=cliente_id)
-
+        # 🔹 Crear o actualizar carrito
         obj, created = CarShop.objects.get_or_create(
             producto=producto,
             cliente=cliente,
             user=self.request.user,
             defaults={
                 'cantidad': cantidad,
-                'precio' : precio_unitario,
+                'precio': precio_unitario,
             }
         )
-        #
+
         if not created:
             nueva_cantidad = obj.cantidad + cantidad
 
-            # 🔥 VALIDAR STOCK ANTES DE SUMAR
             if nueva_cantidad > producto.cantidad:
                 messages.error(
                     self.request,
@@ -109,12 +119,13 @@ class AddCarView(VentasPermisoMixin, FormView):
             obj.precio = precio_unitario
             obj.save()
 
+        # 🔹 Respuesta AJAX
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             context = self.get_context_data()
             context['form'] = self.form_class()
             return render(self.request, 'sales/partials/carrito.html', context)
 
-        return super(AddCarView, self).form_valid(form)
+        return super().form_valid(form)
     
 class CarShopAddView(VentasPermisoMixin, View):
     """ aumenta en 1 la cantidad en un carshop """

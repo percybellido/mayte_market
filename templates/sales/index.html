@@ -166,7 +166,7 @@
 
     // 👉 Cliente → Producto
     cliente.on('select2:select', function() {
-        producto.select2('open');
+        $('#producto').focus();
     });
 
     // 👉 Producto → Cantidad
@@ -212,7 +212,7 @@ document.getElementById("form-agregar").addEventListener("submit", function(e) {
         if (precio) precio.value = '';
 
         // enfocar producto
-        $('#producto').select2('open');
+        $('#producto').focus();
     }, 50);
     })
     .catch(error => console.error("Error:", error));

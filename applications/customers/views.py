@@ -81,7 +81,7 @@ class HistorialClienteUtilidad(ListView):
             Venta.objects.filter(Venta_CliId=cliente)
             .annotate(
                 utilidad_total=Sum(
-                    (F('detalles__VD_Precio') - F('detalles__producto__precio_compra')) * F('detalles__VD_Cantidad'),
+                    (F('detalles__VD_Precio') - F('detalles__VD_precio_compra')) * F('detalles__VD_Cantidad'),
                     output_field=FloatField()
                 ),
                 monto_total=Sum(
