@@ -23,7 +23,7 @@
 </div>
 
 
-<table class="table fuente table-dark table-hover mb-0 w-100">
+<table class="table fuente table-dark table-hover mb-0 w-100" id="clientes">
   <thead>
     <tr>
       <th>Id</th>
@@ -102,10 +102,10 @@
     <!-- Anterior -->
     {% if page_obj.has_previous %}
       <li class="page-item">
-        <a class="page-link" href="?page=1">&laquo;&laquo;</a>
+        <a class="page-link" href="?page=1#clientes">&laquo;&laquo;</a>
       </li>
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}#clientes">Anterior</a>
       </li>
     {% endif %}
 
@@ -113,7 +113,7 @@
     {% for i in paginator.page_range %}
       {% if i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
         <li class="page-item {% if page_obj.number == i %}active{% endif %}">
-          <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+          <a class="page-link" href="?page={{ i }}#clientes">{{ i }}</a>
         </li>
       {% endif %}
     {% endfor %}
@@ -121,10 +121,10 @@
     <!-- Siguiente -->
     {% if page_obj.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}#clientes">Siguiente</a>
       </li>
       <li class="page-item">
-        <a class="page-link" href="?page={{ paginator.num_pages }}">&raquo;&raquo;</a>
+        <a class="page-link" href="?page={{ paginator.num_pages }}#clientes">&raquo;&raquo;</a>
       </li>
     {% endif %}
 
