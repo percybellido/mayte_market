@@ -491,3 +491,7 @@ a .navbar-brand{
     object-fit: cover;
     padding: 10px;
 }
+
+html {
+  scroll-behavior: smooth;
+}

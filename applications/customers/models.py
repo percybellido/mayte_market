@@ -82,11 +82,11 @@ class Cliente(models.Model):
     def color_alerta(self):
         """Devuelve clase CSS según los días de vencimiento"""
         dias = self.dias_vencidos
-        if dias >= 13:
+        if dias >= 21:
             return "filarojo"
-        elif dias > 10:
+        elif dias > 16:
             return "filanaranja"
-        elif dias > 5:
+        elif dias > 7:
             return "filaamarillo"
         return ""
 
