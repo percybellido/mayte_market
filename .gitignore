@@ -32,3 +32,6 @@ Thumbs.db
 
 #Archivos Media
 media/
+
+#Archivos staticfiles
+staticfiles/
