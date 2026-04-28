@@ -57,7 +57,7 @@ class HistorialClienteView(ListView):
             .filter(VD_VentasId__Venta_CliId=cliente)
             .aggregate(
                 total=Sum(
-                    (F('VD_Precio') - F('producto__precio_compra')) * F('VD_Cantidad'),
+                    (F('VD_Precio') - F('VD__precio_compra')) * F('VD_Cantidad'),
                     output_field=FloatField()
                 )
             )['total'] or 0
