@@ -35,3 +35,6 @@ media/
 
 #Archivos staticfiles
 staticfiles/
+
+#Variables de entorno
+.env
