@@ -5,9 +5,18 @@
     <div class="card-body">
       <h2 class="text-center mb-4">Utilidad de ventas del cliente: {{ cliente.nombre }}</h2>
 
+      <p class="text-center fs-5 mb-1">
+        <strong>Utilidad histórica:</strong>
+        <span class="text-success">
+            S/. {{ utilidad_acumulada|floatformat:2 }}
+        </span>
+      </p>
+
       <p class="text-center fs-5">
-        <strong>Utilidad acumulada:</strong>
-        <span class="text-success">{{ utilidad_acumulada|floatformat:2 }}</span>
+          <strong>Utilidad acumulada {{ anio_actual }}:</strong>
+          <span class="text-primary">
+              S/. {{ utilidad_anual|floatformat:2 }}
+          </span>
       </p>
 
       <div class="table-responsive">

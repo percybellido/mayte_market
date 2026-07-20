@@ -322,14 +322,7 @@ class ConfirmarVentaView(LoginRequiredMixin, View):
         if not cliente_id:
             return redirect('venta_app:venta-index')  # Redirigir si no hay cliente
 
-        #cliente = Cliente.objects.get(id=cliente_id)
-        #carrito = CarShop.objects.filter(
-            #cliente=cliente,
-            #user=request.user
-        #)
         
-        #if not carrito.exists():
-            #return redirect('venta_app:venta-index')  # Redirigir si el carrito está vacío
         try:
             with transaction.atomic():
                 venta=procesar_venta(

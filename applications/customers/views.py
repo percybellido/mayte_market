@@ -1,3 +1,5 @@
+from django.utils import timezone
+from datetime import date
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.views.generic import ListView, TemplateView, DetailView
@@ -70,6 +72,9 @@ from django.db.models import Sum, F, FloatField
 from applications.sales.models import Venta
 
 class HistorialClienteUtilidad(ListView):
+    hoy=timezone.now().date()
+    inicio_anio=date(hoy.year, 1, 1)
+
     model = Venta
     template_name = 'customers/cliente_utilidad.html'
     context_object_name = "ventas"
@@ -102,6 +107,30 @@ class HistorialClienteUtilidad(ListView):
             self.get_queryset().aggregate(total=Sum('utilidad_total'))['total'] or 0
         )
         context["utilidad_acumulada"] = utilidad_acumulada
+
+        # Utilidad acumulada del año actual
+    
+        hoy = timezone.now().date()
+        inicio_anio = date(hoy.year, 1, 1)
+
+        utilidad_anual = (
+            Venta.objects.filter(
+                Venta_CliId=cliente,
+                Venta_Fecha__date__gte=inicio_anio,
+                Venta_Fecha__date__lte=hoy,
+            )
+            .aggregate(
+                total=Sum(
+                    (F('detalles__VD_Precio') - F('detalles__VD_precio_compra')) *
+                    F('detalles__VD_Cantidad'),
+                    output_field=FloatField()
+                )
+            )["total"] or 0
+        )
+
+        context["utilidad_anual"] = utilidad_anual
+        context["anio_actual"] = hoy.year
+        
         return context
 
 def buscar_clientes(request):
