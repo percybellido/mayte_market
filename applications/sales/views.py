@@ -215,8 +215,7 @@ class ListVentas(ListView):
 class RegistrarPagoView(FormView):
     template_name = 'sales/registrar_pago.html'
     form_class = PagoForm
-    success_url = reverse_lazy('venta_app:lista-ventas')
-
+   
     def form_valid(self, form):
         registrar_pago(
             cliente=form.cleaned_data['cliente'],
@@ -228,7 +227,7 @@ class RegistrarPagoView(FormView):
 class RegistrarAbonoView(FormView):
     template_name = 'sales/registrar_abono.html'
     form_class = AbonoForm
-    success_url = reverse_lazy('cliente_app:lista-clientes')
+    success_url = reverse_lazy('cliente_app:historial_saldos')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -315,6 +314,11 @@ class RegistrarAbonoView(FormView):
             pago.save(update_fields=["saldo_despues"])
 
         return super().form_valid(form)
+
+    def get_success_url(self):
+        if hasattr(self, 'cliente_abonado'):
+            return reverse('cliente_app:historial_saldos', kwargs={'pk': self.cliente_abonado.pk})
+        return reverse('cliente_app:lista-clientes')
     
 class ConfirmarVentaView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
